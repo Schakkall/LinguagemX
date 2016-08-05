@@ -10,4 +10,8 @@ public class BinExp extends Exp {
 		this.dirExp  = dir;
 		this.op      = op;
 	}
+
+	public Object accept(XVisitor visitor) {
+		return visitor.visitBinExp(this);
+	}
 }
