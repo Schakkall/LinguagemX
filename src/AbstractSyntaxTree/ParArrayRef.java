@@ -7,4 +7,8 @@ public class ParArrayRef extends ParBaseRef {
 		super(tipo, id);
 		this.dim = dim;
 	}
+	
+	public Object accept(XVisitor visitor) {
+		return visitor.visitParArrayRef(this);
+	}
 }

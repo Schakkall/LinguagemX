@@ -7,4 +7,8 @@ public class ParArrayCopia extends ParBaseCopia {
 		super(tipo, id);
 		this.dim = dim;
 	}
+	
+	public Object accept(XVisitor visitor){
+		return visitor.visitParArrayCopia(this);
+	}
 }

@@ -24,6 +24,8 @@ public interface XVisitor {
 	public Object visitNao(Nao nao);
 	public Object visitParBaseCopia(ParBaseCopia parBaseCopia);
 	public Object visitParBaseRef(ParBaseRef parBaseRef);
+	public Object visitParArrayCopia(ParArrayCopia parArrayCopia);
+	public Object visitParArrayRef(ParArrayRef parArrayRef);
 	public Object visitProcedimento(Procedimento procedimento);
 	public Object visitPrograma(Programa programa);
 	public Object visitTipoBase(TipoBase tipoBase);
