@@ -10,4 +10,8 @@ public class LiteralInt extends Literal {
 	public LiteralInt(Integer i){
 		this.num = i;
 	}
+	
+	public Object accept(XVisitor visitor){
+		return visitor.visitLiteralInt(this);
+	}
 }

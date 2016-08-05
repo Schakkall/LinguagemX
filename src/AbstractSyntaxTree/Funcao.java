@@ -12,4 +12,7 @@ public class Funcao extends Dec {
 		this.params = params;
 		this.exp = exp;
 	}
+	public Object accept(XVisitor visitor){
+		return visitor.visitFuncao(this);
+	}
 }

@@ -6,4 +6,7 @@ public class DecCons extends Dec {
 	public DecCons(DVar dvar) {
 		this.dvar = dvar;
 	}
+	public Object accept(XVisitor visitor){
+		return visitor.visitDecCons(this);
+	}
 }

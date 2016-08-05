@@ -12,4 +12,8 @@ public class Procedimento extends Dec {
 		this.params = params;
 		this.com = com;
 	}
+	
+	public Object accept(XVisitor visitor){
+		return visitor.visitProcedimento(this);
+	}
 }

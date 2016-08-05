@@ -7,4 +7,8 @@ public class VarInic extends DVar {
 		super(tipo, id);
 		this.ini = ini;
 	}
+	
+	public Object accept(XVisitor visitor) {
+		return visitor.visitVarInic(this);
+	}
 }

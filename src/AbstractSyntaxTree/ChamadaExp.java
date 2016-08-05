@@ -10,4 +10,8 @@ public class ChamadaExp extends Exp {
 		this.id = id;
 		this.expList = expList;
 	}	
+	
+	public Object accept(XVisitor visitor) {
+		return visitor.visitChamadaExp(this);
+	}
 }

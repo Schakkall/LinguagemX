@@ -15,4 +15,8 @@ public class ComandoIf extends Comando {
 		this.comandoEntao  = comandoEntao;
 		this.comandoSenao  = comandoSenao;
 	}	
+	
+	public Object accept(XVisitor visitor) {
+		return visitor.visitComandoIf(this);
+	}
 }

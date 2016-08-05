@@ -8,4 +8,7 @@ public class ComandoAtribuicao extends Comando {
 		this.var = var;
 		this.exp = exp;
 	}
+	public Object accept(XVisitor visitor) {
+		return visitor.visitComandoAtribuicao(this);
+	}
 }

@@ -9,4 +9,8 @@ public class VarInicExt extends DVar {
 		super(tipo, id);
 		this.expList = expList;
 	}
+	
+	public Object accept (XVisitor visitor){
+		return visitor.visitVarInicExt(this);
+	}
 }

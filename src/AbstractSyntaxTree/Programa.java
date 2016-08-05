@@ -19,4 +19,8 @@ public class Programa extends ASA {
 	public void IncluirDeclaracao(Dec dec) {
 		this.decList.add(dec);
 	}	
+	
+	public Object accept(XVisitor visitor){
+		return visitor.visitPrograma(this);
+	}
 }

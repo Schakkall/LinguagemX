@@ -11,4 +11,7 @@ public class ConsComp extends DCons {
 		this.idList = idList;
 		this.exp = exp;
 	}
+	public Object accept(XVisitor visitor) {
+		return visitor.visitConsComp(this);
+	}
 }
