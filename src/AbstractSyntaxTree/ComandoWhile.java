@@ -8,4 +8,7 @@ public class ComandoWhile extends Comando {
 		this.condicao = condicao;
 		this.comando  = comando;
 	}
+	public Object accept(XVisitor visitor) {
+		return visitor.visitComandoWhile(this);
+	}
 }

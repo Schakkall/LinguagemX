@@ -9,5 +9,8 @@ public class ConsExt extends DCons {
 		super(tipo, id);
 		this.expList = expList;
 	}
+	public Object accept(XVisitor visitor){
+		return visitor.visitConsExt(this);
+	}
 
 }

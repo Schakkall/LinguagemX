@@ -10,4 +10,8 @@ public class LiteralBool extends Literal {
 	public LiteralBool(Boolean b) {
 		this.bool = b; 
 	}	
+	
+	public Object accept(XVisitor visitor){
+		return visitor.visitLiteralBool(this);
+	}
 }

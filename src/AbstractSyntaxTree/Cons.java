@@ -7,4 +7,7 @@ public class Cons extends DCons {
 		super(tipo, id);
 		this.cons = cons;
 	}
+	public Object accept(XVisitor visitor) {
+		return visitor.visitCons(this);
+	}
 }

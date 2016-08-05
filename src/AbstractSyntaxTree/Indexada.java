@@ -8,4 +8,8 @@ public class Indexada extends Var {
 		this.var = var;
 		this.index = index;
 	}
+	
+	public Object accept(XVisitor visitor){
+		return visitor.visitIndexada(this);
+	}
 }

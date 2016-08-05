@@ -18,4 +18,7 @@ public class BlocoExp extends Exp {
 	public void AddExp(DCons consList) {
 		this.consList.add(consList);
 	}
+	public Object accept(XVisitor visitor) {
+		return visitor.visitBlocoExp(this);
+	}
 }

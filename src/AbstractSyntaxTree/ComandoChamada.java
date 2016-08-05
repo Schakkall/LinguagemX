@@ -10,4 +10,7 @@ public class ComandoChamada extends Comando {
 		this.id = id;
 		this.expLst = expLst;
 	}
+	public Object accept(XVisitor visitor) {
+		return visitor.visitComandoChamada(this);
+	}
 }

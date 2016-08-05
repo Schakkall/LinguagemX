@@ -11,4 +11,8 @@ public class VarInicComp extends DVar {
 		this.exp = exp;
 		this.idList = idList;
 	}
+	
+	public Object accept(XVisitor visitor) {
+		return visitor.visitVarInicComp(this);
+	}
 }
