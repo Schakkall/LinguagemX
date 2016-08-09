@@ -1,8 +1,17 @@
 package checagem;
 
 import sintaxeAbstrata.*;
-import ambiente.AmbienteVarCons;
-import ambiente.AmbienteFunProc;
+import ambiente.*;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Essa classe ainda não foi finalizada
+ * @author Raz
+ *
+ */
+
 
 public final class XChecker implements XVisitor {
 	
@@ -84,11 +93,19 @@ public final class XChecker implements XVisitor {
 	}
 	
 	public Object visitFuncao(Funcao funcao){
-		return null;
+		List<VinculavelVarCons> parLst = new ArrayList<VinculavelVarCons>();
+		
+		for (Parametro par: funcao.params) 
+			parLst.add((VinculavelVarCons)par.accept(this));
+			
+		VinculavelVarCons retorno = new VinculavelVarCons((ITipoSemantico)funcao.tipo.accept(this), true);
+		
+		ambienteSubRotinas.put(funcao.id, new VinculavelFunProc(parLst, retorno ));
+		return retorno;
 	}
 	
 	public Object visitIndexada(Indexada indexada){
-		return null;
+		return indexada.var.accept(this);
 	}
 	
 	public Object visitLiteralBool(LiteralBool literalBool){
@@ -108,22 +125,36 @@ public final class XChecker implements XVisitor {
 	}
 	
 	public Object visitParBaseCopia(ParBaseCopia parBaseCopia){
+		ITipoSemantico tipo = (ITipoSemantico) parBaseCopia.tipo.accept(this);
+		ambienteVarCons.put(parBaseCopia.id, new VinculavelVarCons(tipo, false));		
 		return null;
 	}
 	
 	public Object visitParBaseRef(ParBaseRef parBaseRef){
+		ITipoSemantico tipo = (ITipoSemantico) parBaseRef.tipo.accept(this);
+		ambienteVarCons.put(parBaseRef.id, new VinculavelVarCons(tipo, false));		
 		return null;
 	}
 	
 	public Object visitParArrayCopia(ParArrayCopia parArrayCopia){
+		ITipoSemantico tipo = (ITipoSemantico) parArrayCopia.tipo.accept(this);
+		ambienteVarCons.put(parArrayCopia.id, new VinculavelVarCons(tipo, false));				
 		return null;
 	}
 	
 	public Object visitParArrayRef(ParArrayRef parArrayRef){
+		ITipoSemantico tipo = (ITipoSemantico) parArrayRef.tipo.accept(this);
+		ambienteVarCons.put(parArrayRef.id, new VinculavelVarCons(tipo, false));				
 		return null;
 	}
 	
 	public Object visitProcedimento(Procedimento procedimento){
+		List<VinculavelVarCons> parLst = new ArrayList<VinculavelVarCons>();
+		
+		for (Parametro par: procedimento.params) 
+			parLst.add((VinculavelVarCons)par.accept(this));
+		
+		ambienteSubRotinas.put(procedimento.id, new VinculavelFunProc(parLst));
 		return null;
 	}
 	
@@ -141,35 +172,42 @@ public final class XChecker implements XVisitor {
 		return new TArray(this.tipoSemantico(tipoArray.base), tipoArray.expList.size());
 	}	
 	
-	public Object visitVarExp(VarExp varExp){
-		return null;
+	public Object visitVarExp(VarExp varExp){		
+		return varExp.accept(this);
 	}
 	
 	public Object visitVarInic(VarInic varInic){
+		ITipoSemantico tipo = (ITipoSemantico) varInic.tipo.accept(this);
+		ambienteVarCons.put(varInic.id, new VinculavelVarCons(tipo, false));				
 		return null;
 	}
 	
 	public Object visitVarInicComp(VarInicComp varInicComp){
+		ITipoSemantico tipo = (ITipoSemantico) varInicComp.tipo.accept(this);
+		ambienteVarCons.put(varInicComp.id, new VinculavelVarCons(tipo, false));		
 		return null;
 	}
 	
-	public Object visitVarInicExt(VarInicExt inicExt){
+	public Object visitVarInicExt(VarInicExt varInicExt){
+		ITipoSemantico tipo = (ITipoSemantico) varInicExt.tipo.accept(this);
+		ambienteVarCons.put(varInicExt.id, new VinculavelVarCons(tipo, false));
 		return null;
 	}
 	
 	public Object visitVarNaoInic(VarNaoInic varNaoInic){
+		ITipoSemantico tipo = (ITipoSemantico) varNaoInic.tipo.accept(this);
+		ambienteVarCons.put(varNaoInic.id, new VinculavelVarCons(tipo, false));
 		return null;
 	}
 
-	@Override
 	public Object visitSimples(Simples simples) {
-		// TODO Auto-generated method stub
-		return null;
+		return ambienteVarCons.lookup(simples.id);
 	}
 
-	@Override
 	public Object visitBloco(Bloco bloco) {
-		// TODO Auto-generated method stub
+		for (DVarConsCom c : bloco.comList) {
+			c.accept(this);
+		}
 		return null;
 	}
 }

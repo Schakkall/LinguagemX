@@ -4,7 +4,7 @@ public class AmbienteVarCons {
 	final int SIZE = 256;
 	AmarracaoVarCons tabela[] = new AmarracaoVarCons[SIZE];
 	
-	private int getPosSimbolo(String s){
+	private final int getPosSimbolo(String s){
 		Simbolo sim = Simbolo.getSimbolo(s);
 		return sim.hashcode() % this.SIZE;
 	}

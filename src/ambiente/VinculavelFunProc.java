@@ -5,18 +5,18 @@ import java.util.List;
 public class VinculavelFunProc extends Vinculavel {
 	public boolean isFunc;
 	public List<VinculavelVarCons> params;
-	public VinculavelVarCons tipoRetorno;
+	public VinculavelVarCons retorno;
 	
-	public VinculavelFunProc(List<VinculavelVarCons> params, VinculavelVarCons tipoRetorno) {
+	public VinculavelFunProc(List<VinculavelVarCons> params, VinculavelVarCons retorno) {
 		this.isFunc = true;
 		this.params = params;
-		this.tipoRetorno = tipoRetorno;
+		this.retorno = retorno;
 	}
 	
 	public VinculavelFunProc(List<VinculavelVarCons> params) {
 		this.isFunc = false;
 		this.params = params;
-		this.tipoRetorno = null;
+		this.retorno = null;
 	}
 	
 	public boolean equals(){
