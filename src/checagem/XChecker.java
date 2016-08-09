@@ -56,6 +56,7 @@ public final class XChecker implements XVisitor {
 	}
 	
 	public Object visitDecVar(DecVar decVar){
+		
 		return null;
 	}
 	
@@ -107,7 +108,9 @@ public final class XChecker implements XVisitor {
 		return null;
 	}
 	
-	public Object visitPrograma(Programa programa){
+	public Object visitPrograma(Programa programa){		
+		for (Dec d : programa.decList) 
+			d.accept(this);		
 		return null;
 	}
 	
@@ -132,6 +135,18 @@ public final class XChecker implements XVisitor {
 	}
 	
 	public Object visitVarNaoInic(VarNaoInic varNaoInic){
+		return null;
+	}
+
+	@Override
+	public Object visitSimples(Simples simples) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Object visitBloco(Bloco bloco) {
+		// TODO Auto-generated method stub
 		return null;
 	}
 }
