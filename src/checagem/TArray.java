@@ -8,4 +8,8 @@ public class TArray implements ITipoSemantico {
 		this.tipo = tipo;
 		this.size = size;
 	}
+	
+	public boolean equals(TArray a){
+		return (this.size == a.size) && (tipo.equals(a.tipo));
+	}
 }

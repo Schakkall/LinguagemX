@@ -18,4 +18,14 @@ public class VinculavelFunProc extends Vinculavel {
 		this.params = params;
 		this.tipoRetorno = null;
 	}
+	
+	public boolean equals(){
+		/* TODO Implementar método equals de VinculavelFunProc
+		 * Dois VinculavelFunProc x e y são iguais quando:
+		 * 1) x.isFunc == y.isFunc
+		 * 2) x.tipoRetorno.equals(y.tipoRetorno)
+		 * 3) Os elementos de x.params retornam "true" para equals com os elementos da mesma posição em y.params
+		 */
+		return false;
+	}
 }
