@@ -1,8 +1,27 @@
 package checagem;
 
 import sintaxeAbstrata.*;
+import ambiente.AmbienteVarCons;
+import ambiente.AmbienteFunProc;
 
 public final class XChecker implements XVisitor {
+	
+	AmbienteFunProc ambienteSubRotinas = new AmbienteFunProc();
+	AmbienteVarCons ambienteVarCons    = new AmbienteVarCons();
+	
+	public checagem.TBase tipoSemantico(sintaxeAbstrata.TBase b){
+		switch (b) {
+		case BOOL:
+			return checagem.TBase.BOOL;
+		case INT:
+			return checagem.TBase.INT;
+		case REAL:
+			return checagem.TBase.REAL;
+		default:
+			return null;
+		}
+	}
+	
 	public Object visitBinExp(BinExp binExp){
 		return null;
 	}
@@ -115,8 +134,12 @@ public final class XChecker implements XVisitor {
 	}
 	
 	public Object visitTipoBase(TipoBase tipoBase){
-		return null;
+		return this.tipoSemantico(tipoBase.base);
 	}
+	
+	public Object visitTipoArray(TipoArray tipoArray) {
+		return new TArray(this.tipoSemantico(tipoArray.base), tipoArray.expList.size());
+	}	
 	
 	public Object visitVarExp(VarExp varExp){
 		return null;

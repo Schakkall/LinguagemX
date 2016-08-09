@@ -36,4 +36,5 @@ public interface XVisitor {
 	public Object visitVarNaoInic(VarNaoInic varNaoInic);
 	public Object visitSimples(Simples simples);
 	public Object visitBloco(Bloco bloco);
+	public Object visitTipoArray(TipoArray tipoArray);
 }

@@ -2,6 +2,7 @@ package main;
 
 import java.util.ArrayList;
 import java.util.List;
+import ambiente.Simbolo;
 
 import sintaxeAbstrata.*;
 
@@ -33,6 +34,7 @@ public class Main {
 		 * 		x := y;
 		 * 		y := temp;
 		 * }
+		 * 
 		 * */
 		
 		List<Parametro> paramList = new ArrayList<Parametro>();
@@ -54,7 +56,7 @@ public class Main {
 	}
 	
 	
-	public static void main(){
-		
+	public static void main(String[] args){
+
 	}	
 }

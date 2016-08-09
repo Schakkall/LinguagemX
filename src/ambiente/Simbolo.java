@@ -7,7 +7,7 @@ public class Simbolo {
 	private String id;
 	private int hashCd;
 	
-	private static Map<String,Simbolo> dict =
+	public static Map<String,Simbolo> dict =
 			new HashMap<String,Simbolo>();
 
 	private int hashcode_(String s) {
@@ -23,7 +23,7 @@ public class Simbolo {
 	}
 	
 	public String toString() {
-		return this.id; 
+		return this.id + ' ' + this.hashCd; 
 	}
 	
 	public static Simbolo getSimbolo(String n) {

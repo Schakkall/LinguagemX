@@ -9,4 +9,8 @@ public class TipoArray extends TipoBase {
 		super(base);
 		this.expList = expList;
 	}
+	
+	public Object accept(XVisitor visitor){
+		return visitor.visitTipoArray(this);
+	}
 }

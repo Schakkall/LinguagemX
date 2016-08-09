@@ -4,15 +4,18 @@ public class AmbienteVarCons {
 	final int SIZE = 256;
 	AmarracaoVarCons tabela[] = new AmarracaoVarCons[SIZE];
 	
-	public void put(String s, VinculavelVarCons amarracao){
+	private int getPosSimbolo(String s){
 		Simbolo sim = Simbolo.getSimbolo(s);
-		int index = sim.hashcode() % this.SIZE;
+		return sim.hashcode() % this.SIZE;
+	}
+	
+	public void put(String s, VinculavelVarCons amarracao){
+		int index = this.getPosSimbolo(s);
 		tabela[index] = new AmarracaoVarCons(s, amarracao, tabela[index]);
 	}
 	
 	public VinculavelVarCons lookup(String s) {
-		Simbolo sim = Simbolo.getSimbolo(s);
-		int index = sim.hashcode() % this.SIZE;
+		int index = this.getPosSimbolo(s);
 		for(AmarracaoVarCons a = tabela[index]; a != null; a = a.proximo) 
 			if (s.equals(a.id))
 				return a.amarracao;
@@ -20,8 +23,7 @@ public class AmbienteVarCons {
 	}
 	
 	public void pop(String s){
-		Simbolo sim = Simbolo.getSimbolo(s);
-		int index = sim.hashcode() % this.SIZE;
+		int index = this.getPosSimbolo(s);
 		tabela[index] = tabela[index].proximo;// Joga o anterior para o GC
 	}
 }
