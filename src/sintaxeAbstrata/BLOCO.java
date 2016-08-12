@@ -3,14 +3,14 @@ package sintaxeAbstrata;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Bloco extends Comando {
+public class BLOCO extends Comando {
 	public List<DVarConsCom> comList; 
 
-	public Bloco(){
+	public BLOCO(){
 		this.comList = new ArrayList<DVarConsCom>();
 	} 	
 	
-	public Bloco(List<DVarConsCom> comList){
+	public BLOCO(List<DVarConsCom> comList){
 		this.comList = comList;
 	} 
 	
@@ -19,6 +19,6 @@ public class Bloco extends Comando {
 	}
 
 	public Object accept(XVisitor visitor) {
-		return visitor.visitBloco(this);
+		return visitor.visitBLOCO(this);
 	}	
 }

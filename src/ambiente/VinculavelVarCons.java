@@ -12,6 +12,6 @@ public class VinculavelVarCons extends Vinculavel {
 	}
 	
 	public boolean equals(VinculavelVarCons v){
-		return ((this.isCons == v.isCons) && (this.tipo.equals(v.tipo)));
+		return (/*(this.isCons == v.isCons) &&*/ (this.tipo.equals(v.tipo)));
 	}
 }

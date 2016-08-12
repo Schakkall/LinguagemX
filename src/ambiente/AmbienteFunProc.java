@@ -4,6 +4,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class AmbienteFunProc {
+	AmbienteVarCons ambienteVarCons;
+	
+	public AmbienteFunProc(AmbienteVarCons ambienteVarCons) {
+		this.ambienteVarCons = ambienteVarCons;
+	}
+	
 	private Map<String, VinculavelFunProc> ambiente = 
 			new HashMap<String, VinculavelFunProc>();
 	

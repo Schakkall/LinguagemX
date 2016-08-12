@@ -5,10 +5,10 @@ public interface XVisitor {
 	public Object visitBlocoExp(BlocoExp blocoExp);
 	public Object visitChamadaExp(ChamadaExp chamadaExp);
 	public Object visitCom(Com com);
-	public Object visitComandoAtribuicao(ComandoAtribuicao comandoAtribuicao);
-	public Object visitComandoChamada(ComandoChamada comandoChamada);
-	public Object visitComandoIf(ComandoIf comandoIf);
-	public Object visitComandoWhile(ComandoWhile comandoWhile);
+	public Object visitASSIGN(ASSIGN comandoAtribuicao);
+	public Object visitCHAMADA(CHAMADA comandoChamada);
+	public Object visitIF(IF comandoIf);
+	public Object visitWHILE(WHILE comandoWhile);
 	public Object visitCons(Cons cons);
 	public Object visitConsComp(ConsComp consComp);
 	public Object visitConsExt(ConsExt consExt);
@@ -35,6 +35,6 @@ public interface XVisitor {
 	public Object visitVarInicExt(VarInicExt inicExt);
 	public Object visitVarNaoInic(VarNaoInic varNaoInic);
 	public Object visitSimples(Simples simples);
-	public Object visitBloco(Bloco bloco);
+	public Object visitBLOCO(BLOCO bloco);
 	public Object visitTipoArray(TipoArray tipoArray);
 }

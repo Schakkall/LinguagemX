@@ -9,7 +9,12 @@ public class TArray implements ITipoSemantico {
 		this.size = size;
 	}
 	
-	public boolean equals(TArray a){
-		return (this.size == a.size) && (tipo.equals(a.tipo));
+	public boolean equals(ITipoSemantico a){
+		return (a instanceof TArray) ? (tipo.equals(((TArray)a).tipo)) : tipo.equals(a);
 	}
+	
+	public String toString(){
+		return tipo.toString() + "[" + size + "]";
+	}
+
 }

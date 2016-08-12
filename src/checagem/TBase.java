@@ -5,7 +5,7 @@ public enum TBase implements ITipoSemantico {
 	BOOL,
 	REAL;
 	
-	public boolean equals(TBase b){
-		return (this == b);
+	public boolean equals(ITipoSemantico b){
+		return (this == (TBase)b);
 	}
 }

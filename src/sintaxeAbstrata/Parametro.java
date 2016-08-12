@@ -1,10 +1,10 @@
 package sintaxeAbstrata;
 
 public abstract class Parametro extends ASA {
-	public Tipo tipo;
+	public TBase tipo;
 	public String id;
 	
-	public Parametro(Tipo tipo, String id) {
+	public Parametro(TBase tipo, String id) {
 		this.tipo = tipo;
 		this.id   = id;
 	}

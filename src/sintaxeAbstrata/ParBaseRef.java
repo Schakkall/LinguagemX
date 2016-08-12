@@ -1,7 +1,7 @@
 package sintaxeAbstrata;
 
 public class ParBaseRef extends Parametro {
-	public ParBaseRef(Tipo tipo, String id) {
+	public ParBaseRef(TBase tipo, String id) {
 		super(tipo, id);
 	}
 	
