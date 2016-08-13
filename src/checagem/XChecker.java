@@ -56,6 +56,7 @@ public final class XChecker implements XVisitor {
 		
 		if (erro){
 			reporter.reportError("Expressao binária(%) inválida entre " + t1 + " e " + t2, "BinExp("+binExp.op+")");
+			//Retornar um inteiro
 			return null;
 		}	
 		else 	
@@ -79,6 +80,7 @@ public final class XChecker implements XVisitor {
 	public Object visitASSIGN(ASSIGN comandoAtribuicao){
 		ITipoSemantico t1 = (ITipoSemantico)comandoAtribuicao.var.accept(this);
 		ITipoSemantico t2 = (ITipoSemantico)comandoAtribuicao.exp.accept(this);
+		//Lembrar de fazer a coerção
 		if (!(t1.equals(t2))){
 			reporter.reportError("Atribuição(%) inválida entre " + t1 + " e " + t2, "ASSIGN");
 			return null;
@@ -214,6 +216,9 @@ public final class XChecker implements XVisitor {
 	}
 	
 	public Object visitProcedimento(Procedimento procedimento){
+		//Verifica se existe a declaração
+		//Coloacar na tabela de simbolos
+		//Abrir escopo
 		List<VinculavelVarCons> parLst = new ArrayList<VinculavelVarCons>();
 		
 		for (Parametro par: procedimento.params) 
@@ -221,6 +226,7 @@ public final class XChecker implements XVisitor {
 		
 		ambienteSubRotinas.put(procedimento.id, new VinculavelFunProc(parLst));
 		procedimento.com.accept(this);
+		//Fechar escopo
 		return null;
 	}
 	
@@ -243,6 +249,7 @@ public final class XChecker implements XVisitor {
 	}
 	
 	public Object visitVarInic(VarInic varInic){
+		//Verificar se a varável já foi declarada
 		ITipoSemantico tipo = (ITipoSemantico) varInic.tipo.accept(this);
 		ambienteVarCons.put(varInic.id, new VinculavelVarCons(tipo, false));				
 		return null;
@@ -268,12 +275,14 @@ public final class XChecker implements XVisitor {
 
 	public Object visitSimples(Simples simples) {
 		return ambienteVarCons.lookup(simples.id).tipo;
+		//Reportar variável não declarada
 	}
 
 	public Object visitBLOCO(BLOCO bloco) {
-		for (DVarConsCom c : bloco.comList) {
+		//Iniciar bloco
+		for (DVarConsCom c : bloco.comList) 
 			c.accept(this);
-		}
+		//Finalizar bloco
 		return null;
 	}
 }

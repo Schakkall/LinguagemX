@@ -2,66 +2,116 @@ package main;
 
 import java.util.ArrayList;
 import java.util.List;
-import checagem.XChecker;
+
 import sintaxeAbstrata.*;
 
 public class Main {
 
-	Programa programa1(){
-		/*
-    	 * function int soma(int x, int y) (x + y)
-		 * 
-		 * */
-		
-		List<Parametro> paramList = new ArrayList<Parametro>();
-		paramList.add(new ParBaseCopia(TBase.INT, "x"));
-		paramList.add(new ParBaseCopia(TBase.INT, "y"));
-		
-		Exp exp = new BinExp(BinOp.SOM, new VarExp(new Simples("x")) , new VarExp(new Simples("y")));
-		
-		List<Dec> decList = new ArrayList<Dec>();
-		decList.add(new Funcao(new TipoBase(TBase.INT), "soma", paramList, exp));
-				
-		return new Programa(decList);
-	}
-	
-	static Programa programa2(){
-		/*
-		 * procedure troca(var int x, var int y) {
-		 * 		var int temp;
-		 * 		temp := x;
-		 * 		x := y;
-		 * 		y := (5 + 8) * 9 * temp;
+	// Programa da sequencia de Fibonnaci ate 500
+	static Programa programa1() {
+	    /*
+	     * 
+		 * procedure fibonnaci(int n, var int res){ 
+		 * 		var int vFib1 := 1; 
+		 * 		var int vFib2 := 0; 
+		 * 		var int vAuxF := 0; 
+		 *  	while (vFib2 < n) { 
+		 *      	vAuxF := vFib1 + vFib2; 
+		 *      	vFib1 := vFib2; 
+		 *      	vFib2 := vAuxF;
+		 *		}
+		 *		res := vFib2;
 		 * }
 		 * 
+		 * main(){
+		 * 		var int res;
+		 * 		fibonnaci(500, res);
+		 * }
+		 * 
+		 * 
+		 *      
 		 * */
+
+		List<DVarConsCom> decComFibo = new ArrayList<>();
+		decComFibo.add(new DV(new VarInic(new TipoBase(TBase.INT), "vAuxF", new LiteralInt(0))));
+		decComFibo.add(new DV(new VarInic(new TipoBase(TBase.INT), "vFib1", new LiteralInt(1))));
+		decComFibo.add(new DV(new VarInic(new TipoBase(TBase.INT), "vFib2", new LiteralInt(0))));
+
+		List<DVarConsCom> comandosLoop = new ArrayList<>();
+		comandosLoop.add(new Com(new ASSIGN(new Simples("vAuxF"),
+				new BinExp(BinOp.SOM, new VarExp(new Simples("vFib1")), new VarExp(new Simples("vFb2"))))));
+		comandosLoop.add(new Com(new ASSIGN(new Simples("vFb1"), new VarExp(new Simples("vFb2")))));
+		comandosLoop.add(new Com(new ASSIGN(new Simples("vFb2"), new VarExp(new Simples("vAuxF")))));
+
+		decComFibo.add( 
+				new Com(new WHILE(new BinExp(BinOp.MENOR, new VarExp(new Simples("vFbi2")), new LiteralInt(500)),
+						new BLOCO(comandosLoop))));
+						
+		BLOCO corpoFibo = new BLOCO(decComFibo);
+
+		List<Parametro> parListFibo = new ArrayList<>();
+		parListFibo.add(new ParBaseCopia(TBase.INT, "n"));
+		parListFibo.add(new ParBaseRef(TBase.INT, "res"));
+
+		Procedimento fibonnaci = new Procedimento("fibonacci", parListFibo, corpoFibo);
+
+		List<DVarConsCom> decComMain = new ArrayList<>();
 		
+		List<Exp> expList = new ArrayList<>();
+		expList.add(new LiteralInt(500));
+		expList.add(new VarExp(new Simples("res")));
+
+		decComMain.add(new Com(new CHAMADA("fibonnaci", expList)));
+
+		BLOCO corpoMain = new BLOCO(decComMain);
+
+		List<Parametro> parListMain = new ArrayList<>();
+
+		Procedimento main = new Procedimento("main", parListMain, corpoMain);
+
+		List<Dec> dList = new ArrayList<>();
+		dList.add(fibonnaci);
+		dList.add(main);
+
+		return new Programa(dList);
+	}
+
+	Programa programa2() {
+		/*
+		 * function int quadradoP(int a, int b) { var int temp; a := 2; b := 3;
+		 * temp := (a*a) - 2*(a*b) + (b*b); }
+		 * 
+		 */
+
+		// declara parametros
 		List<Parametro> paramList = new ArrayList<Parametro>();
-		paramList.add(new ParBaseRef(TBase.BOOL, "x"));
-		paramList.add(new ParBaseRef(TBase.INT, "y"));
-		paramList.add(new ParArrayRef(TBase.INT, "z", 5));
-		
+		paramList.add(new ParBaseCopia(TBase.INT, "a"));
+		paramList.add(new ParBaseCopia(TBase.INT, "b"));
+
+		// declaraÁ„o de variaveis
 		List<DVarConsCom> cmdList = new ArrayList<DVarConsCom>();
 		cmdList.add(new DV(new VarNaoInic(new TipoBase(TBase.INT), "temp")));
-		cmdList.add(new Com(new ASSIGN(new Simples("temp"), new BinExp(BinOp.OU, new VarExp(new Simples("x")), new LiteralBool(false)))));
-		//cmdList.add(new Com(new ASSIGN(new Simples("x"), new VarExp(new Simples("y")))));
-		cmdList.add(new Com(new ASSIGN(new Indexada(new Simples("z"), new LiteralInt(2)), new VarExp(new Simples("temp")))));
-		
-		BLOCO bloco = new BLOCO(cmdList);
-				
+
+		// atribui√ß√£o aos parametros
+		cmdList.add(new Com(new ASSIGN(new Simples("a"), new LiteralInt(2))));
+		cmdList.add(new Com(new ASSIGN(new Simples("b"), new LiteralInt(3))));
+
+		// monta express√µes
+		Exp exp1 = new BinExp(BinOp.MUL, new VarExp(new Simples("a")), new VarExp(new Simples("a")));
+		Exp exp2 = new BinExp(BinOp.MUL, new VarExp(new Simples("b")), new VarExp(new Simples("b")));
+		Exp exp3 = new BinExp(BinOp.MUL, new VarExp(new Simples("a")), new VarExp(new Simples("b")));
+		Exp exp4 = new BinExp(BinOp.MUL, new LiteralInt(2), exp3);
+
+		Exp exp5 = new BinExp(BinOp.SUB, exp1, exp4);
+		Exp exp6 = new BinExp(BinOp.SOM, exp5, exp2);
+
 		List<Dec> decList = new ArrayList<Dec>();
-		decList.add(new Procedimento("troca", paramList, bloco));
-				
+		decList.add(new Funcao(new TipoBase(TBase.INT), "quadradoP", paramList, exp6));
+
 		return new Programa(decList);
+
 	}
-	
-	public static Programa programa3(){
-		return null;
+
+	public static void main(String[] args) {
 	}
-	
-	
-	public static void main(String[] args){
-		XChecker checador = new XChecker();
-		checador.visitPrograma(programa2());
-	}	
 }
