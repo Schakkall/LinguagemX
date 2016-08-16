@@ -3,6 +3,7 @@ package main;
 import java.util.ArrayList;
 import java.util.List;
 
+import checagem.XChecker;
 import sintaxeAbstrata.*;
 
 public class Main {
@@ -23,7 +24,7 @@ public class Main {
 		 *		res := vFib2;
 		 * }
 		 * 
-		 * main(){
+		 * procedure main(){
 		 * 		var int res;
 		 * 		fibonnaci(500, res);
 		 * }
@@ -39,12 +40,12 @@ public class Main {
 
 		List<DVarConsCom> comandosLoop = new ArrayList<>();
 		comandosLoop.add(new Com(new ASSIGN(new Simples("vAuxF"),
-				new BinExp(BinOp.SOM, new VarExp(new Simples("vFib1")), new VarExp(new Simples("vFb2"))))));
-		comandosLoop.add(new Com(new ASSIGN(new Simples("vFb1"), new VarExp(new Simples("vFb2")))));
-		comandosLoop.add(new Com(new ASSIGN(new Simples("vFb2"), new VarExp(new Simples("vAuxF")))));
+				new BinExp(BinOp.SOM, new VarExp(new Simples("vFib1")), new VarExp(new Simples("vFib2"))))));
+		comandosLoop.add(new Com(new ASSIGN(new Simples("vFib1"), new VarExp(new Simples("vFib2")))));
+		comandosLoop.add(new Com(new ASSIGN(new Simples("vFib2"), new VarExp(new Simples("vAuxF")))));
 
 		decComFibo.add( 
-				new Com(new WHILE(new BinExp(BinOp.MENOR, new VarExp(new Simples("vFbi2")), new LiteralInt(500)),
+				new Com(new WHILE(new BinExp(BinOp.MENOR, new VarExp(new Simples("vFib2")), new LiteralInt(500)),
 						new BLOCO(comandosLoop))));
 						
 		BLOCO corpoFibo = new BLOCO(decComFibo);
@@ -78,7 +79,10 @@ public class Main {
 
 	Programa programa2() {
 		/*
-		 * function int quadradoP(int a, int b) { var int temp; a := 2; b := 3;
+		 * function int quadradoP(int a, int b) { 
+		 * var int temp; 
+		 * a := 2; 
+		 * b := 3;
 		 * temp := (a*a) - 2*(a*b) + (b*b); }
 		 * 
 		 */
@@ -113,5 +117,8 @@ public class Main {
 	}
 
 	public static void main(String[] args) {
+		
+		XChecker c = new XChecker();
+		c.visitPrograma(programa1());
 	}
 }
