@@ -37,4 +37,5 @@ public interface XVisitor {
 	public Object visitSimples(Simples simples);
 	public Object visitBLOCO(BLOCO bloco);
 	public Object visitTipoArray(TipoArray tipoArray);
+	public Object visitIntToReal(IntToReal intToReal);
 }

@@ -1,12 +1,12 @@
 package ambiente;
 
-import checagem.ITipoSemantico;
+import checagem.ITSemantico;
 
 public class VinculavelVarCons extends Vinculavel {
 	public boolean isCons;
-	public ITipoSemantico tipo;
+	public ITSemantico tipo;
 	
-	public VinculavelVarCons(ITipoSemantico tipo, boolean isCons){
+	public VinculavelVarCons(ITSemantico tipo, boolean isCons){
 		this.isCons = isCons;
 		this.tipo   = tipo;
 	}

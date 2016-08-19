@@ -16,12 +16,12 @@ public class Main {
 		 * 		var int vFib1 := 1; 
 		 * 		var int vFib2 := 0; 
 		 * 		var int vAuxF := 0; 
-		 *  	while (vFib2 < n) { 
-		 *      	vAuxF := vFib1 + vFib2; 
-		 *      	vFib1 := vFib2; 
-		 *      	vFib2 := vAuxF;
-		 *		}
-		 *		res := vFib2;
+		 * 		while (vFib2 < n) { 
+		 * 			vAuxF := vFib1 + vFib2; 
+		 * 			vFib1 := vFib2; 
+		 * 			vFib2 := vAuxF;
+		 * 		}
+		 * 		res := vFib2;
 		 * }
 		 * 
 		 * procedure main(){
@@ -30,11 +30,10 @@ public class Main {
 		 * }
 		 * 
 		 * 
-		 *      
 		 * */
 
 		List<DVarConsCom> decComFibo = new ArrayList<>();
-		decComFibo.add(new DV(new VarInic(new TipoBase(TBase.INT), "vAuxF", new LiteralInt(0))));
+		decComFibo.add(new DV(new VarInic(new TipoBase(TBase.BOOL), "vAuxF", new LiteralInt(0))));
 		decComFibo.add(new DV(new VarInic(new TipoBase(TBase.INT), "vFib1", new LiteralInt(1))));
 		decComFibo.add(new DV(new VarInic(new TipoBase(TBase.INT), "vFib2", new LiteralInt(0))));
 
@@ -120,5 +119,7 @@ public class Main {
 		
 		XChecker c = new XChecker();
 		c.visitPrograma(programa1());
+		c.reporter.imprimirRelatorio();
+		
 	}
 }
