@@ -6,7 +6,7 @@ import java.util.LinkedList;
 public class AmbienteVarCons {
 	private final int SIZE = 256;
 	private AmarracaoVarCons tabela[] = new AmarracaoVarCons[SIZE];
-	private LinkedList<ArrayList<String>> escopo = new LinkedList<ArrayList<String>>(); 
+	private LinkedList<ArrayList<String>> plihaEscopo = new LinkedList<ArrayList<String>>(); 
 	
 	private final int getPosSimbolo(String s){
 		Simbolo sim = Simbolo.getSimbolo(s);
@@ -14,8 +14,8 @@ public class AmbienteVarCons {
 	}
 	
 	public void put(String s, VinculavelVarCons amarracao){
-		if (!this.escopo.isEmpty())
-			this.escopo.getFirst().add(s);
+		if (!this.plihaEscopo.isEmpty())
+			this.plihaEscopo.getFirst().add(s);
 
 		int index = this.getPosSimbolo(s);
 		tabela[index] = new AmarracaoVarCons(s, amarracao, tabela[index]);
@@ -40,14 +40,14 @@ public class AmbienteVarCons {
 	}
 	
 	public void openScope(){
-		this.escopo.addFirst(new ArrayList<String>());
+		this.plihaEscopo.addFirst(new ArrayList<String>());
 	}
 	
 	public void closeScope(){
-		if (!this.escopo.isEmpty()){
-			for (String id : this.escopo.getFirst())
+		if (!this.plihaEscopo.isEmpty()){
+			for (String id : this.plihaEscopo.getFirst())
 				this.pop(id);
-			this.escopo.removeFirst();
+			this.plihaEscopo.removeFirst();
 		}
 	}
 }

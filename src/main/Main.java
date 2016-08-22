@@ -25,15 +25,17 @@ public class Main {
 		 * }
 		 * 
 		 * procedure main(){
+		 * 		var int[10][10][10] x;
 		 * 		var int res;
 		 * 		fibonnaci(500, res);
+		 * 		x[5][5][5] = res;
 		 * }
 		 * 
 		 * 
 		 * */
 
 		List<DVarConsCom> decComFibo = new ArrayList<>();
-		decComFibo.add(new DV(new VarInic(new TipoBase(TBase.BOOL), "vAuxF", new LiteralInt(0))));
+		decComFibo.add(new DV(new VarInic(new TipoBase(TBase.INT), "vAuxF", new LiteralInt(0))));
 		decComFibo.add(new DV(new VarInic(new TipoBase(TBase.INT), "vFib1", new LiteralInt(1))));
 		decComFibo.add(new DV(new VarInic(new TipoBase(TBase.INT), "vFib2", new LiteralInt(0))));
 
@@ -62,6 +64,35 @@ public class Main {
 		expList.add(new VarExp(new Simples("res")));
 
 		decComMain.add(new Com(new CHAMADA("fibonnaci", expList)));
+	
+		List<Exp> arrayExp = new ArrayList<>();
+		arrayExp.add(new LiteralInt(10));
+		arrayExp.add(new LiteralInt(10));
+		arrayExp.add(new LiteralInt(10));
+		decComMain.add(new DV( new VarNaoInic(new TipoArray(TBase.INT, arrayExp), "x")));
+		
+		decComMain.add(new Com(
+							new ASSIGN(
+									//new Indexada(
+											new Indexada(
+													new Indexada( 
+															new Indexada(
+																	new Simples("x"), 
+																	new LiteralInt(5)), 
+															new LiteralInt(5)), 
+													new LiteralInt(5)),		
+									//		new LiteralInt(5)), 
+									new VarExp(//new Simples("res")
+											
+											new Indexada(
+													new Indexada( 
+															new Indexada(
+																	new Simples("x"), 
+																	new LiteralInt(5)), 
+															new LiteralInt(5)),
+													new LiteralInt(5))		
+											))));
+		
 
 		BLOCO corpoMain = new BLOCO(decComMain);
 
@@ -78,10 +109,7 @@ public class Main {
 
 	Programa programa2() {
 		/*
-		 * function int quadradoP(int a, int b) { 
-		 * var int temp; 
-		 * a := 2; 
-		 * b := 3;
+		 * function int quadradoP(int a, int b) { var int temp; a := 2; b := 3;
 		 * temp := (a*a) - 2*(a*b) + (b*b); }
 		 * 
 		 */
@@ -116,10 +144,10 @@ public class Main {
 	}
 
 	public static void main(String[] args) {
-		
+
 		XChecker c = new XChecker();
 		c.visitPrograma(programa1());
 		c.reporter.imprimirRelatorio();
-		
+
 	}
 }

@@ -29,12 +29,12 @@ public final class XChecker implements XVisitor {
 	public Object visitBinExp(BinExp binExp) {
 		ITSemantico tEsq = (ITSemantico) binExp.esqExp.accept(this);
 		ITSemantico tDir = (ITSemantico) binExp.dirExp.accept(this);
-
+/*
 		if (tEsq instanceof TArray)
 			tEsq = ((TArray) tEsq).tipo;
 		if (tDir instanceof TArray)
 			tDir = ((TArray) tDir).tipo;
-
+*/
 		if (TBase.isBool(tEsq) && TBase.isBool(tDir))
 			if (SemanOper.isBoolOper(binExp.op))
 				return TBase.BOOL;
@@ -99,9 +99,9 @@ public final class XChecker implements XVisitor {
 		for (DCons dC: blocoExp.consList){
 			dC.accept(this);
 		}
-		ITSemantico e = (ITSemantico)blocoExp.exp.accept(this); 
+		ITSemantico t = (ITSemantico)blocoExp.exp.accept(this); 
 		ambienteVarCons.closeScope();
-		return e;
+		return t;
 	}
 
 	public Object visitChamadaExp(ChamadaExp chamadaExp) {
@@ -122,7 +122,7 @@ public final class XChecker implements XVisitor {
 		if (TBase.isReal(t1) && TBase.isInt(t2))
 			t2 = (ITSemantico) (comandoAtribuicao.exp = new IntToReal(comandoAtribuicao.exp)).accept(this);
 		
-		if (!t1.compatible(t2)) {
+		if (!t1.equals(t2)) {
 			reporter.reportarErro("Atribuição: Atribuir um " + t2 + " a um " + t1 + " não é uma operação válida");
 		}
 		
@@ -130,10 +130,22 @@ public final class XChecker implements XVisitor {
 	}
 
 	public Object visitCHAMADA(CHAMADA comandoChamada) {
+		VinculavelFunProc vinculo = ambienteSubRotinas.lookup(comandoChamada.id);
+		ITSemantico t = ((vinculo != null) && (vinculo.isFunc)) ? vinculo.retorno.tipo : null;
+
+		if (comandoChamada.expLst.size() != vinculo.params.size()){
+			reporter.reportarErro("Chamada: Número de paramêtros difere do declarado.");
+		} else
+		for (int i = 0; i < comandoChamada.expLst.size(); i++){
+			ITSemantico t1 = (ITSemantico) comandoChamada.expLst.get(i).accept(this);
+			ITSemantico t2 = vinculo.params.get(i).tipo;
+			//t2.compatible(t1);
+		}
+		
+		
 		// VinculavelFunProc v = (VinculavelFunProc)
-		// ambienteSubRotinas.lookup(comandoChamada.id);
-		// TODO Implementar checagem de chamadas
-		return null;
+		
+		return t;
 	}
 
 	public Object visitIF(IF comandoIf) {
@@ -196,19 +208,35 @@ public final class XChecker implements XVisitor {
 	}
 
 	public Object visitFuncao(Funcao funcao) {
-		List<VinculavelVarCons> parLst = new ArrayList<VinculavelVarCons>();
+		ambienteVarCons.openScope();
+		List<VinculavelParam> parLst = new ArrayList<VinculavelParam>();
 
-		for (Parametro par : funcao.params)
-			parLst.add((VinculavelVarCons) par.accept(this));
-
-		VinculavelVarCons retorno = new VinculavelVarCons((ITSemantico) funcao.tipo.accept(this), true);
-
-		ambienteSubRotinas.put(funcao.id, new VinculavelFunProc(parLst, retorno));
-		return funcao.exp.accept(this);
+		for (Parametro par : funcao.params){
+			par.accept(this);
+			parLst.add((VinculavelParam)ambienteVarCons.lookup(par.id));
+		}
+	
+		ITSemantico t = (ITSemantico)funcao.exp.accept(this);
+		
+		ambienteSubRotinas.put(funcao.id, new VinculavelFunProc(parLst, new VinculavelVarCons(t, true)));
+		ambienteVarCons.closeScope();
+		return t;
 	}
 
 	public Object visitIndexada(Indexada indexada) {
-		return indexada.var.accept(this);
+		ITSemantico t1 = (ITSemantico) indexada.var.accept(this);
+		if (t1 instanceof TBase)
+			reporter.reportarErro("Var: Uma variável de TipoBase não pode ser indexada");
+		else {
+			t1 = new TArray(((TArray)t1).tipo, ((TArray)t1).dim, ((TArray)t1).level);
+			if (!((TArray)t1).evoluirNivelAcesso()){
+				reporter.reportarErro("Var: Tentando acessar a "+ ((TArray)t1).level +"ª dimensão de um array de "+ ((TArray)t1).dim +" dimensões.");
+			}
+		}
+		ITSemantico t2 = (ITSemantico) indexada.index.accept(this);
+		if (!TBase.isInt(t2))
+			reporter.reportarErro("Idexada: " + t2 + "não pode ser um índice dessa variável");
+		return t1;
 	}
 
 	public Object visitLiteralBool(LiteralBool literalBool) {
@@ -242,35 +270,36 @@ public final class XChecker implements XVisitor {
 	}
 
 	public Object visitParBaseCopia(ParBaseCopia parBaseCopia) {
-		ambienteVarCons.put(parBaseCopia.id, new VinculavelVarCons(tipoSemantico(parBaseCopia.tipo), false));
+		ambienteVarCons.put(parBaseCopia.id, new VinculavelParam(tipoSemantico(parBaseCopia.tipo), false));
 		return null;
 	}
 
 	public Object visitParBaseRef(ParBaseRef parBaseRef) {
-		ambienteVarCons.put(parBaseRef.id, new VinculavelVarCons(tipoSemantico(parBaseRef.tipo), false));
+		ambienteVarCons.put(parBaseRef.id, new VinculavelParam(tipoSemantico(parBaseRef.tipo), true));
 		return null;
 	}
 
 	public Object visitParArrayCopia(ParArrayCopia parArrayCopia) {
 		ambienteVarCons.put(parArrayCopia.id,
-				new VinculavelVarCons(new TArray(tipoSemantico(parArrayCopia.tipo), parArrayCopia.dim), false));
+				new VinculavelParam(new TArray(tipoSemantico(parArrayCopia.tipo), parArrayCopia.dim), false));
 		return null;
 	}
 
 	public Object visitParArrayRef(ParArrayRef parArrayRef) {
 		ambienteVarCons.put(parArrayRef.id,
-				new VinculavelVarCons(new TArray(tipoSemantico(parArrayRef.tipo), parArrayRef.dim), false));
+				new VinculavelParam(new TArray(tipoSemantico(parArrayRef.tipo), parArrayRef.dim), true));
 		return null;
 	}
 
 	public Object visitProcedimento(Procedimento procedimento) {
 		// Verifica se existe a declaração
-		// Coloacar na tabela de simbolos
 		ambienteVarCons.openScope();
-		List<VinculavelVarCons> parLst = new ArrayList<VinculavelVarCons>();
+		List<VinculavelParam> parLst = new ArrayList<VinculavelParam>();
 
-		for (Parametro par : procedimento.params)
-			parLst.add((VinculavelVarCons) par.accept(this));
+		for (Parametro par : procedimento.params){
+			par.accept(this);
+			parLst.add((VinculavelParam)ambienteVarCons.lookup(par.id));
+		}
 
 		ambienteSubRotinas.put(procedimento.id, new VinculavelFunProc(parLst));
 		procedimento.com.accept(this);
