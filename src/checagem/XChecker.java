@@ -26,80 +26,78 @@ public final class XChecker implements XVisitor {
 		}
 	}
 
+	private TBase toReal(Exp exp) {
+		exp = new IntToReal(exp);
+		return TBase.REAL;
+	}
+
 	public Object visitBinExp(BinExp binExp) {
 		ITSemantico tEsq = (ITSemantico) binExp.esqExp.accept(this);
 		ITSemantico tDir = (ITSemantico) binExp.dirExp.accept(this);
-/*
-		if (tEsq instanceof TArray)
-			tEsq = ((TArray) tEsq).tipo;
-		if (tDir instanceof TArray)
-			tDir = ((TArray) tDir).tipo;
-*/
+
 		if (TBase.isBool(tEsq) && TBase.isBool(tDir))
 			if (SemanOper.isBoolOper(binExp.op))
 				return TBase.BOOL;
 			else {
-				reporter.reportarErro("Expressão binária: Operacao " + binExp.op + " inválida entre tipos " + tEsq + " e " + tDir);
+				reporter.reportarErro(
+						"Expressão binária: Operacao " + binExp.op + " inválida entre tipos " + tEsq + " e " + tDir);
 				return TBase.BOOL;
 			}
-		else 
-		if (TBase.isInt(tEsq) && TBase.isInt(tDir))
+		else if (TBase.isInt(tEsq) && TBase.isInt(tDir))
 			if (SemanOper.isNumOper(binExp.op))
 				return TBase.INT;
-			else 
-			if (SemanOper.isRelaOper(binExp.op))
+			else if (SemanOper.isRelaOper(binExp.op))
 				return TBase.BOOL;
 			else {
-				reporter.reportarErro("Expressão binária: Operacao " + binExp.op + " inválida entre tipos " + tEsq + " e " + tDir);
+				reporter.reportarErro(
+						"Expressão binária: Operacao " + binExp.op + " inválida entre tipos " + tEsq + " e " + tDir);
 				return TBase.INT;
 			}
-		else 
-		if (TBase.isReal(tEsq) && TBase.isReal(tDir))
+		else if (TBase.isReal(tEsq) && TBase.isReal(tDir))
 			if (SemanOper.isNumOper(binExp.op) && binExp.op != BinOp.MOD)
 				return TBase.REAL;
-			else 
-			if (SemanOper.isRelaOper(binExp.op))
-				return TBase.BOOL;		
+			else if (SemanOper.isRelaOper(binExp.op))
+				return TBase.BOOL;
 			else {
-				reporter.reportarErro("Expressão binária: Operacao " + binExp.op + " inválida entre tipos " + tEsq + " e " + tDir);
+				reporter.reportarErro(
+						"Expressão binária: Operacao " + binExp.op + " inválida entre tipos " + tEsq + " e " + tDir);
 				return TBase.REAL;
 			}
-		else 
-		if (TBase.isInt(tEsq) && TBase.isReal(tDir)) {
-			tEsq = (ITSemantico) (binExp.esqExp = new IntToReal(binExp.esqExp)).accept(this);
+		else if (TBase.isInt(tEsq) && TBase.isReal(tDir)) {
+			tEsq = this.toReal(binExp.esqExp);
 			if (SemanOper.isNumOper(binExp.op) && binExp.op != BinOp.MOD)
 				return TBase.REAL;
-			else 
-			if (SemanOper.isRelaOper(binExp.op))
-				return TBase.BOOL;			
+			else if (SemanOper.isRelaOper(binExp.op))
+				return TBase.BOOL;
 			else {
-				reporter.reportarErro("Expressão binária: Operacao " + binExp.op + " inválida entre tipos " + tEsq + " e " + tDir);
+				reporter.reportarErro(
+						"Expressão binária: Operacao " + binExp.op + " inválida entre tipos " + tEsq + " e " + tDir);
 				return TBase.REAL;
 			}
-		} else 
-		if (TBase.isReal(tEsq) && TBase.isInt(tDir)) {
-			tDir = (ITSemantico) (binExp.dirExp = new IntToReal(binExp.esqExp)).accept(this);
+		} else if (TBase.isReal(tEsq) && TBase.isInt(tDir)) {
+			tDir = this.toReal(binExp.dirExp);
 			if (SemanOper.isNumOper(binExp.op) && binExp.op != BinOp.MOD)
 				return TBase.REAL;
-			else 
-			if (SemanOper.isRelaOper(binExp.op))
-				return TBase.BOOL;			
+			else if (SemanOper.isRelaOper(binExp.op))
+				return TBase.BOOL;
 			else {
-				reporter.reportarErro("Expressão binária: Operacao " + binExp.op + " inválida entre tipos " + tEsq + " e " + tDir);
+				reporter.reportarErro(
+						"Expressão binária: Operacao " + binExp.op + " inválida entre tipos " + tEsq + " e " + tDir);
 				return TBase.REAL;
 			}
 		} else {
-			reporter.reportarErro("Expressão binária: Operacao " + binExp.op + " inválida entre tipos " + tEsq + " e " + tDir);
+			reporter.reportarErro(
+					"Expressão binária: Operacao " + binExp.op + " inválida entre tipos " + tEsq + " e " + tDir);
 			return TBase.INT;
 		}
 	}
 
 	public Object visitBlocoExp(BlocoExp blocoExp) {
 		ambienteVarCons.openScope();
-		for (DCons dC: blocoExp.consList){
+		for (DCons dC : blocoExp.consList) {
 			dC.accept(this);
 		}
-		ITSemantico t = (ITSemantico)blocoExp.exp.accept(this); 
+		ITSemantico t = (ITSemantico) blocoExp.exp.accept(this);
 		ambienteVarCons.closeScope();
 		return t;
 	}
@@ -116,16 +114,16 @@ public final class XChecker implements XVisitor {
 	public Object visitASSIGN(ASSIGN comandoAtribuicao) {
 		ITSemantico t1 = (ITSemantico) comandoAtribuicao.var.accept(this);
 		ITSemantico t2 = (ITSemantico) comandoAtribuicao.exp.accept(this);
-		
-		//Testar declaração da variável
-		
+
+		// Testar declaração da variável
+
 		if (TBase.isReal(t1) && TBase.isInt(t2))
-			t2 = (ITSemantico) (comandoAtribuicao.exp = new IntToReal(comandoAtribuicao.exp)).accept(this);
-		
+			t2 = this.toReal(comandoAtribuicao.exp);
+
 		if (!t1.equals(t2)) {
 			reporter.reportarErro("Atribuição: Atribuir um " + t2 + " a um " + t1 + " não é uma operação válida");
 		}
-		
+
 		return null;
 	}
 
@@ -133,27 +131,35 @@ public final class XChecker implements XVisitor {
 		VinculavelFunProc vinculo = ambienteSubRotinas.lookup(comandoChamada.id);
 		ITSemantico t = ((vinculo != null) && (vinculo.isFunc)) ? vinculo.retorno.tipo : null;
 
-		if (comandoChamada.expLst.size() != vinculo.params.size()){
-			reporter.reportarErro("Chamada: Número de paramêtros difere do declarado.");
+		if (comandoChamada.expLst.size() != vinculo.params.size()) {
+			reporter.reportarErro("Chamada: Número de paramêtros difere do declarado");
 		} else
-		for (int i = 0; i < comandoChamada.expLst.size(); i++){
-			ITSemantico t1 = (ITSemantico) comandoChamada.expLst.get(i).accept(this);
-			ITSemantico t2 = vinculo.params.get(i).tipo;
-			//t2.compatible(t1);
-		}
-		
-		
-		// VinculavelFunProc v = (VinculavelFunProc)
-		
+			for (int i = 0; i < comandoChamada.expLst.size(); i++) {
+				ITSemantico t1 = (ITSemantico) comandoChamada.expLst.get(i).accept(this);
+				ITSemantico t2 = vinculo.params.get(i).tipo;
+
+				if (TBase.isInt(t1) && (TBase.isReal(t2))) {
+					comandoChamada.expLst.set(i, new IntToReal(comandoChamada.expLst.get(i)));
+					t1 = TBase.REAL;
+				}
+
+				if (vinculo.params.get(i).isRef)
+					if (!VarExp.isVarExp(comandoChamada.expLst.get(i)))
+						reporter.reportarErro("Chamada: Passagem de parâmetros por referência exige uma variável");
+
+				if (!t2.equals(t1))
+					reporter.reportarErro("Chamada: Tipo do parâmetro real difere do tipo do parâmetro formal");
+			}
+
 		return t;
 	}
 
 	public Object visitIF(IF comandoIf) {
 		ITSemantico t = (ITSemantico) comandoIf.condicao.accept(this);
-		
+
 		if (!TBase.isBool(t))
-			reporter.reportarErro("If: " + t + " não é adequado para a condição de um if");
-			
+			reporter.reportarErro("If: " + t + " não é um tipo adequado para a condição de um if");
+
 		comandoIf.comandoEntao.accept(this);
 		comandoIf.comandoSenao.accept(this);
 		return null;
@@ -163,8 +169,8 @@ public final class XChecker implements XVisitor {
 		ITSemantico t = (ITSemantico) comandoWhile.condicao.accept(this);
 
 		if (!TBase.isBool(t))
-			reporter.reportarErro("While: " + t + " não é adequado para a condição de um while");
-		
+			reporter.reportarErro("While: " + t + " não é um tipo adequado para a condição de um while");
+
 		comandoWhile.comando.accept(this);
 		return null;
 	}
@@ -211,13 +217,13 @@ public final class XChecker implements XVisitor {
 		ambienteVarCons.openScope();
 		List<VinculavelParam> parLst = new ArrayList<VinculavelParam>();
 
-		for (Parametro par : funcao.params){
+		for (Parametro par : funcao.params) {
 			par.accept(this);
-			parLst.add((VinculavelParam)ambienteVarCons.lookup(par.id));
+			parLst.add((VinculavelParam) ambienteVarCons.lookup(par.id));
 		}
-	
-		ITSemantico t = (ITSemantico)funcao.exp.accept(this);
-		
+
+		ITSemantico t = (ITSemantico) funcao.exp.accept(this);
+
 		ambienteSubRotinas.put(funcao.id, new VinculavelFunProc(parLst, new VinculavelVarCons(t, true)));
 		ambienteVarCons.closeScope();
 		return t;
@@ -226,12 +232,15 @@ public final class XChecker implements XVisitor {
 	public Object visitIndexada(Indexada indexada) {
 		ITSemantico t1 = (ITSemantico) indexada.var.accept(this);
 		if (t1 instanceof TBase)
-			reporter.reportarErro("Var: Uma variável de TipoBase não pode ser indexada");
+			reporter.reportarErro("Idexada: Uma variável TipoBase não pode ser indexada");
 		else {
-			t1 = new TArray(((TArray)t1).tipo, ((TArray)t1).dim, ((TArray)t1).level);
-			if (!((TArray)t1).evoluirNivelAcesso()){
-				reporter.reportarErro("Var: Tentando acessar a "+ ((TArray)t1).level +"ª dimensão de um array de "+ ((TArray)t1).dim +" dimensões.");
+			TArray t1AsTArray = ((TArray) t1).clone();//Evitando typecasting
+
+			if (!t1AsTArray.evoluirIndexacao()) {
+				reporter.reportarErro("Idexada: Tentando acessar a " + t1AsTArray.level + "ª dimensão de um array de "
+						+ t1AsTArray.dim + " dimensões.");
 			}
+			t1 = t1AsTArray;
 		}
 		ITSemantico t2 = (ITSemantico) indexada.index.accept(this);
 		if (!TBase.isInt(t2))
@@ -249,7 +258,7 @@ public final class XChecker implements XVisitor {
 
 	public Object visitMenos(Menos menos) {
 		ITSemantico t = (ITSemantico) menos.exp.accept(this);
-	
+		
 		if (TBase.isNum(t))
 			return t;
 		else {
@@ -260,7 +269,7 @@ public final class XChecker implements XVisitor {
 
 	public Object visitNao(Nao nao) {
 		ITSemantico t = (ITSemantico) nao.exp.accept(this);
-		
+
 		if (TBase.isBool(t))
 			return t;
 		else {
@@ -292,13 +301,13 @@ public final class XChecker implements XVisitor {
 	}
 
 	public Object visitProcedimento(Procedimento procedimento) {
-		// Verifica se existe a declaração
+		// Verificar se existe a declaração
 		ambienteVarCons.openScope();
 		List<VinculavelParam> parLst = new ArrayList<VinculavelParam>();
 
-		for (Parametro par : procedimento.params){
+		for (Parametro par : procedimento.params) {
 			par.accept(this);
-			parLst.add((VinculavelParam)ambienteVarCons.lookup(par.id));
+			parLst.add((VinculavelParam) ambienteVarCons.lookup(par.id));
 		}
 
 		ambienteSubRotinas.put(procedimento.id, new VinculavelFunProc(parLst));
@@ -353,12 +362,12 @@ public final class XChecker implements XVisitor {
 	public Object visitSimples(Simples simples) {
 		VinculavelVarCons vinculo = ambienteVarCons.lookup(simples.id);
 		ITSemantico t = (vinculo != null) ? vinculo.tipo : null;
-		
+
 		if (t == null) {
-			reporter.reportarErro("Variável: identificador " + simples.id + " não declarado");
+			reporter.reportarErro("Simples: identificador " + simples.id + " não declarado");
 			t = TBase.INT;
 		}
-		
+
 		return t;
 	}
 

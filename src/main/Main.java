@@ -59,17 +59,23 @@ public class Main {
 
 		List<DVarConsCom> decComMain = new ArrayList<>();
 		
+		decComMain.add(new DV(new VarInic(new TipoBase(TBase.INT), "res", new LiteralInt(0))));
+		
 		List<Exp> expList = new ArrayList<>();
 		expList.add(new LiteralInt(500));
+		//expList.add(new LiteralInt(50));
 		expList.add(new VarExp(new Simples("res")));
 
-		decComMain.add(new Com(new CHAMADA("fibonnaci", expList)));
+		decComMain.add(new Com(new CHAMADA("fibonacci", expList)));
 	
 		List<Exp> arrayExp = new ArrayList<>();
 		arrayExp.add(new LiteralInt(10));
 		arrayExp.add(new LiteralInt(10));
 		arrayExp.add(new LiteralInt(10));
+		arrayExp.add(new LiteralInt(10));
 		decComMain.add(new DV( new VarNaoInic(new TipoArray(TBase.INT, arrayExp), "x")));
+		
+		
 		
 		decComMain.add(new Com(
 							new ASSIGN(
@@ -83,14 +89,15 @@ public class Main {
 													new LiteralInt(5)),		
 									//		new LiteralInt(5)), 
 									new VarExp(//new Simples("res")
-											
+											new Indexada(
 											new Indexada(
 													new Indexada( 
 															new Indexada(
 																	new Simples("x"), 
 																	new LiteralInt(5)), 
 															new LiteralInt(5)),
-													new LiteralInt(5))		
+													new LiteralInt(5)),
+												new LiteralInt(5))
 											))));
 		
 

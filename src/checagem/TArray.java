@@ -1,6 +1,6 @@
 package checagem;
 
-public class TArray implements ITSemantico {
+public class TArray implements ITSemantico, Cloneable {
 	public TBase tipo;
 	public int dim;
 	public int level = 0;
@@ -24,7 +24,7 @@ public class TArray implements ITSemantico {
 			return (tipo.equals((TBase)a) &&  this.dimensaoNivelAcesso()==0);
 	}
 	
-	public boolean evoluirNivelAcesso(){
+	public boolean evoluirIndexacao(){
 		return (++this.level <= this.dim) ? true : false;
 	}
 	
@@ -57,5 +57,13 @@ public class TArray implements ITSemantico {
 			return TBase.isBool(((TArray)a).tipo);
 		else
 			return false;
-	}	
+	}
+	
+	public TArray clone(){
+		try {
+			return (TArray) super.clone();
+		} catch	(CloneNotSupportedException e) {
+			return null;
+		}
+	}
 }

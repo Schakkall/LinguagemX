@@ -4,7 +4,6 @@ import checagem.ITSemantico;
 
 public class VinculavelParam extends VinculavelVarCons {
 	public boolean isRef;
-	public ITSemantico tipo;
 	
 	public VinculavelParam(ITSemantico tipo, boolean isRef){
 		super(tipo, false);

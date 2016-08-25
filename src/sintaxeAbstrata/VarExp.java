@@ -10,4 +10,8 @@ public class VarExp extends Exp {
 	public Object accept(XVisitor visitor) {
 		return visitor.visitVarExp(this);
 	}
+	
+	public static boolean isVarExp(Exp node){
+		return ((node instanceof VarExp) || ((node instanceof IntToReal) && (((IntToReal)node).exp instanceof VarExp)));
+	}
 }

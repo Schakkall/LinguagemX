@@ -1,7 +1,7 @@
 package sintaxeAbstrata;
 
 public class IntToReal extends Exp {
-	Exp exp;
+	public Exp exp;
 
 	public IntToReal(Exp exp){
 		this.exp = exp;
