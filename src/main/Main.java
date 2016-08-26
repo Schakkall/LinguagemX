@@ -109,8 +109,9 @@ public class Main {
 		Procedimento main = new Procedimento("main", parListMain, corpoMain);
 
 		List<Dec> dList = new ArrayList<>();
-		dList.add(main);
+		//dList.add(main);
 		dList.add(fibonnaci);
+		dList.add(main);
 
 		return new Programa(dList);
 	}

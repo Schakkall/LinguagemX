@@ -7,8 +7,6 @@ import utils.RegistradorDeErros;
 import java.util.ArrayList;
 import java.util.List;
 
-// TODO Verificar tipos das inicializações das variáveis e constantes
-
 public final class XChecker implements XVisitor {
 
 	AmbienteVarCons ambienteVarCons = new AmbienteVarCons();
@@ -24,7 +22,7 @@ public final class XChecker implements XVisitor {
 				return TBase.BOOL;
 			else {
 				reporter.reportarErro(
-						"Expressão binária: Operacao " + binExp.op + " inválida entre tipos " + tEsq + " e " + tDir);
+						"BinExp: Operacao " + binExp.op + " não se aplica a tipos " + tEsq + " e " + tDir);
 				return TBase.BOOL;
 			}
 		else if (TBase.isInt(tEsq) && TBase.isInt(tDir))
@@ -34,7 +32,7 @@ public final class XChecker implements XVisitor {
 				return TBase.BOOL;
 			else {
 				reporter.reportarErro(
-						"Expressão binária: Operacao " + binExp.op + " inválida entre tipos " + tEsq + " e " + tDir);
+						"BinExp: Operacao " + binExp.op + " não se aplica a tipos " + tEsq + " e " + tDir);
 				return TBase.INT;
 			}
 		else if (TBase.isReal(tEsq) && TBase.isReal(tDir))
@@ -44,7 +42,7 @@ public final class XChecker implements XVisitor {
 				return TBase.BOOL;
 			else {
 				reporter.reportarErro(
-						"Expressão binária: Operacao " + binExp.op + " inválida entre tipos " + tEsq + " e " + tDir);
+						"BinExp: Operacao " + binExp.op + " não se aplica a tipos " + tEsq + " e " + tDir);
 				return TBase.REAL;
 			}
 		else if (TBase.isInt(tEsq) && TBase.isReal(tDir)) {
@@ -55,7 +53,7 @@ public final class XChecker implements XVisitor {
 				return TBase.BOOL;
 			else {
 				reporter.reportarErro(
-						"Expressão binária: Operacao " + binExp.op + " inválida entre tipos " + tEsq + " e " + tDir);
+						"BinExp: Operacao " + binExp.op + " não se aplica a tipos " + tEsq + " e " + tDir);
 				return TBase.REAL;
 			}
 		} else if (TBase.isReal(tEsq) && TBase.isInt(tDir)) {
@@ -66,12 +64,11 @@ public final class XChecker implements XVisitor {
 				return TBase.BOOL;
 			else {
 				reporter.reportarErro(
-						"Expressão binária: Operacao " + binExp.op + " inválida entre tipos " + tEsq + " e " + tDir);
+						"BinExp: Operacao " + binExp.op + " não se aplica a tipos " + tEsq + " e " + tDir);
 				return TBase.REAL;
 			}
 		} else {
-			reporter.reportarErro(
-					"Expressão binária: Operacao " + binExp.op + " inválida entre tipos " + tEsq + " e " + tDir);
+			reporter.reportarErro("BinExp: Operacao " + binExp.op + " não se aplica a tipos " + tEsq + " e " + tDir);
 			return TBase.INT;
 		}
 	}
@@ -88,9 +85,11 @@ public final class XChecker implements XVisitor {
 
 	public Object visitChamadaExp(ChamadaExp chamadaExp) {
 		VinculavelFunProc vinculo = ambienteSubRotinas.lookup(chamadaExp.id);
-		ITSemantico t = ((vinculo != null) && (vinculo.isFunc)) ? vinculo.retorno.tipo : null;
+		ITSemantico t = TBase.INT;
 
-		if (vinculo != null)
+		if (vinculo != null) {
+			t = vinculo.retorno.tipo;
+
 			if (chamadaExp.expLst.size() != vinculo.params.size()) {
 				reporter.reportarErro("Chamada: Número de paramêtros difere do declarado");
 			} else
@@ -115,7 +114,7 @@ public final class XChecker implements XVisitor {
 					if (!t2.equals(t1))
 						reporter.reportarErro("Chamada: Tipo do parâmetro real difere do tipo do parâmetro formal");
 				}
-		else
+		} else
 			reporter.reportarErro("Chamada: Subrotina não declarada");
 
 		return t;
@@ -204,8 +203,16 @@ public final class XChecker implements XVisitor {
 		if (this.ambienteVarCons.isDeclaradaNesteEscopo(cons.id))
 			reporter.reportarErro("Cons: Identificador já declarado");
 		else {
-			ITSemantico tipo = (ITSemantico) cons.tipo.accept(this);
-			ambienteVarCons.put(cons.id, new VinculavelVarCons(tipo, true));
+			ITSemantico t1 = (ITSemantico) cons.tipo.accept(this);
+			ITSemantico t2 = (ITSemantico) cons.cons.accept(this);
+
+			if ((TBase.isReal(t1)) && (TBase.isInt(t2)))
+				this.toReal(cons.cons);
+
+			if (!t1.equals(t2))
+				reporter.reportarErro("Cons: A constante não pode ser incializado com " + t2);
+
+			ambienteVarCons.put(cons.id, new VinculavelVarCons(t1, false));
 		}
 		return null;
 	}
@@ -224,8 +231,22 @@ public final class XChecker implements XVisitor {
 		if (this.ambienteVarCons.isDeclaradaNesteEscopo(consExt.id))
 			reporter.reportarErro("ConsExt: Identificador já declarado");
 		else {
-			ITSemantico tipo = (ITSemantico) consExt.tipo.accept(this);
-			ambienteVarCons.put(consExt.id, new VinculavelVarCons(tipo, true));
+			ITSemantico t1 = (ITSemantico) consExt.tipo.accept(this);
+
+			int i = 0;
+			ITSemantico t2;
+			for (Exp exp : consExt.expList) {
+				t2 = (ITSemantico) exp.accept(this);
+				if ((TBase.isReal(t1)) && (TBase.isInt(t2)))
+					this.toReal(exp);
+				if (!t1.equals(t2))
+					reporter.reportarErro("ConsExt: O " + i + "º elemento da lista não corresponde ao tipo" + t1);
+				;
+				i++;
+			}
+
+			ambienteVarCons.put(consExt.id, new VinculavelVarCons(t1, false));
+
 		}
 		return null;
 	}
@@ -275,10 +296,6 @@ public final class XChecker implements XVisitor {
 		if (t1 instanceof TBase)
 			reporter.reportarErro("Idexada: Uma variável TipoBase não pode ser indexada");
 		else {
-			// TODO Excluir o comentário abaixo
-			// Obs1: t1AsTArray está sendo declarado para evitar typecasting
-			// Obs2: clone() é usado para não alterar o tipo declarado no
-			// ambiente
 			TArray t1AsTArray = ((TArray) t1).clone();
 
 			if (!t1AsTArray.evoluirIndexacao()) {
@@ -370,30 +387,8 @@ public final class XChecker implements XVisitor {
 	}
 
 	public Object visitPrograma(Programa programa) {
-
-		//Registrar subrotinas
 		for (Dec d : programa.decList) {
-			List<VinculavelParam> parLst = new ArrayList<VinculavelParam>();
-			if (d instanceof Procedimento) {
-				Procedimento proc = (Procedimento) d;
-				for (Parametro par : proc.params) {
-					if ((par instanceof ParBaseRef) || (par instanceof ParArrayRef))
-						parLst.add(new VinculavelParam(tipoSemantico(par.tipo), true));
-					else
-						parLst.add(new VinculavelParam(tipoSemantico(par.tipo), false));
-				}
-				ambienteSubRotinas.put(proc.id, new VinculavelFunProc(parLst));
-			} else if (d instanceof Funcao) {
-				Funcao func = (Funcao) d;
-				for (Parametro par : func.params) {
-					if ((par instanceof ParBaseRef) || (par instanceof ParArrayRef))
-						parLst.add(new VinculavelParam(tipoSemantico(par.tipo), true));
-					else
-						parLst.add(new VinculavelParam(tipoSemantico(par.tipo), false));
-				}
-				ambienteSubRotinas.put(func.id, new VinculavelFunProc(parLst,
-						new VinculavelVarCons((ITSemantico) func.tipo.accept(this), true)));
-			}
+			this.registrarSeSubRotina(d);
 		}
 
 		for (Dec d : programa.decList)
@@ -417,8 +412,16 @@ public final class XChecker implements XVisitor {
 		if (this.ambienteVarCons.isDeclaradaNesteEscopo(varInic.id))
 			reporter.reportarErro("VarInic: Identificador já declarado");
 		else {
-			ITSemantico tipo = (ITSemantico) varInic.tipo.accept(this);
-			ambienteVarCons.put(varInic.id, new VinculavelVarCons(tipo, false));
+			ITSemantico t1 = (ITSemantico) varInic.tipo.accept(this);
+			ITSemantico t2 = (ITSemantico) varInic.ini.accept(this);
+
+			if ((TBase.isReal(t1)) && (TBase.isInt(t2)))
+				this.toReal(varInic.ini);
+
+			if (!t1.equals(t2))
+				reporter.reportarErro("VarInic: A variável não pode ser inicializado com " + t2);
+
+			ambienteVarCons.put(varInic.id, new VinculavelVarCons(t1, false));
 		}
 		return null;
 	}
@@ -437,8 +440,21 @@ public final class XChecker implements XVisitor {
 		if (this.ambienteVarCons.isDeclaradaNesteEscopo(varInicExt.id))
 			reporter.reportarErro("VarInicExt: Identificador já declarado");
 		else {
-			ITSemantico tipo = (ITSemantico) varInicExt.tipo.accept(this);
-			ambienteVarCons.put(varInicExt.id, new VinculavelVarCons(tipo, false));
+			ITSemantico t1 = (ITSemantico) varInicExt.tipo.accept(this);
+
+			int i = 0;
+			ITSemantico t2;
+			for (Exp exp : varInicExt.expList) {
+				t2 = (ITSemantico) exp.accept(this);
+				if ((TBase.isReal(t1)) && (TBase.isInt(t2)))
+					this.toReal(exp);
+				if (!t1.equals(t2))
+					reporter.reportarErro("VarInic: O " + i + "º elemento da lista não corresponde ao tipo" + t1);
+				;
+				i++;
+			}
+
+			ambienteVarCons.put(varInicExt.id, new VinculavelVarCons(t1, false));
 		}
 		return null;
 	}
@@ -493,5 +509,29 @@ public final class XChecker implements XVisitor {
 	private TBase toReal(Exp exp) {
 		exp = new IntToReal(exp);
 		return TBase.REAL;
+	}
+
+	private void registrarSeSubRotina(Dec d) {
+		List<VinculavelParam> parLst = new ArrayList<VinculavelParam>();
+		if (d instanceof Procedimento) {
+			Procedimento proc = (Procedimento) d;
+			for (Parametro par : proc.params) {
+				if ((par instanceof ParBaseRef) || (par instanceof ParArrayRef))
+					parLst.add(new VinculavelParam(tipoSemantico(par.tipo), true));
+				else
+					parLst.add(new VinculavelParam(tipoSemantico(par.tipo), false));
+			}
+			ambienteSubRotinas.put(proc.id, new VinculavelFunProc(parLst));
+		} else if (d instanceof Funcao) {
+			Funcao func = (Funcao) d;
+			for (Parametro par : func.params) {
+				if ((par instanceof ParBaseRef) || (par instanceof ParArrayRef))
+					parLst.add(new VinculavelParam(tipoSemantico(par.tipo), true));
+				else
+					parLst.add(new VinculavelParam(tipoSemantico(par.tipo), false));
+			}
+			ambienteSubRotinas.put(func.id,
+					new VinculavelFunProc(parLst, new VinculavelVarCons((ITSemantico) func.tipo.accept(this), true)));
+		}
 	}
 }
