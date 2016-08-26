@@ -10,5 +10,8 @@ public class Simples extends Var {
 	public Object accept(XVisitor visitor) {
 		return visitor.visitSimples(this);
 	}
-
+	
+	public String getId(){
+		return this.id;
+	}
 }

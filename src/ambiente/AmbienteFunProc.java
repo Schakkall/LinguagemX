@@ -14,4 +14,8 @@ public class AmbienteFunProc {
 	public VinculavelFunProc lookup(String id){
 		return this.ambiente.get(id);
 	}
+	
+	public boolean isDeclared(String s){
+		return (this.lookup(s) != null);
+	}
 }

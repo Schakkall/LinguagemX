@@ -26,7 +26,7 @@ public class Main {
 		 * 
 		 * procedure main(){
 		 * 		var int[10][10][10] x;
-		 * 		var int res;
+		 * 		var boolean res;
 		 * 		fibonnaci(500, res);
 		 * 		x[5][5][5] = res;
 		 * }
@@ -38,6 +38,7 @@ public class Main {
 		decComFibo.add(new DV(new VarInic(new TipoBase(TBase.INT), "vAuxF", new LiteralInt(0))));
 		decComFibo.add(new DV(new VarInic(new TipoBase(TBase.INT), "vFib1", new LiteralInt(1))));
 		decComFibo.add(new DV(new VarInic(new TipoBase(TBase.INT), "vFib2", new LiteralInt(0))));
+		//decComFibo.add(new DC(new Cons(new TipoBase(TBase.INT), "vFib2", new LiteralInt(0))));
 
 		List<DVarConsCom> comandosLoop = new ArrayList<>();
 		comandosLoop.add(new Com(new ASSIGN(new Simples("vAuxF"),
@@ -108,8 +109,8 @@ public class Main {
 		Procedimento main = new Procedimento("main", parListMain, corpoMain);
 
 		List<Dec> dList = new ArrayList<>();
-		dList.add(fibonnaci);
 		dList.add(main);
+		dList.add(fibonnaci);
 
 		return new Programa(dList);
 	}

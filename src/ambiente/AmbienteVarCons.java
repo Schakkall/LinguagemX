@@ -50,4 +50,12 @@ public class AmbienteVarCons {
 			this.plihaEscopo.removeFirst();
 		}
 	}
+	
+	public boolean isDeclaradaNesteEscopo(String s){
+		return (this.plihaEscopo.getFirst().contains(s)); 
+	}
+	
+	public boolean isDeclarada(String s) {
+		return (this.lookup(s) != null);
+	}
 }

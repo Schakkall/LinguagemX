@@ -12,4 +12,8 @@ public class Indexada extends Var {
 	public Object accept(XVisitor visitor){
 		return visitor.visitIndexada(this);
 	}
+	
+	public String getId() {
+		return this.var.getId();
+	}	
 }
