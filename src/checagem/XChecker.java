@@ -7,6 +7,15 @@ import utils.RegistradorDeErros;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Classe que efetua análise semântica de programas na linguagem X
+ * 
+ * @author  Simone Ris Santos Silva
+ * @author  J. Eurique C. Ribeiro Jr
+ * @author  Leonardo de Jesus Silva
+ */
+
+
 public final class XChecker implements XVisitor {
 
 	AmbienteVarCons ambienteVarCons = new AmbienteVarCons();
