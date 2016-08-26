@@ -241,7 +241,6 @@ public final class XChecker implements XVisitor {
 					this.toReal(exp);
 				if (!t1.equals(t2))
 					reporter.reportarErro("ConsExt: O " + i + "º elemento da lista não corresponde ao tipo" + t1);
-				;
 				i++;
 			}
 
