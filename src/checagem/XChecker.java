@@ -106,7 +106,7 @@ public final class XChecker implements XVisitor {
 					ITSemantico t1 = (ITSemantico) chamadaExp.expLst.get(i).accept(this);
 					ITSemantico t2 = vinculo.params.get(i).tipo;
 
-					if (TBase.isInt(t1) && (TBase.isReal(t2))) {
+					if (TBase.isInt(t1) && TBase.isReal(t2)) {
 						chamadaExp.expLst.set(i, new IntToReal(chamadaExp.expLst.get(i)));
 						t1 = TBase.REAL;
 					}
@@ -247,14 +247,12 @@ public final class XChecker implements XVisitor {
 			for (Exp exp : consExt.expList) {
 				t2 = (ITSemantico) exp.accept(this);
 				if ((TBase.isReal(t1)) && (TBase.isInt(t2)))
-					this.toReal(exp);
+					this.toReal(exp);				
 				if (!t1.equals(t2))
 					reporter.reportarErro("ConsExt: O " + i + "º elemento da lista não corresponde ao tipo" + t1);
 				i++;
 			}
-
 			ambienteVarCons.put(consExt.id, new VinculavelVarCons(t1, false));
-
 		}
 		return null;
 	}
@@ -395,12 +393,13 @@ public final class XChecker implements XVisitor {
 	}
 
 	public Object visitPrograma(Programa programa) {
-		for (Dec d : programa.decList) {
+		for (Dec d : programa.decList)
 			this.registrarSeSubRotina(d);
-		}
-
+		
+		ambienteVarCons.openScope();
 		for (Dec d : programa.decList)
 			d.accept(this);
+		ambienteVarCons.closeScope();
 		return null;
 	}
 
@@ -458,7 +457,6 @@ public final class XChecker implements XVisitor {
 					this.toReal(exp);
 				if (!t1.equals(t2))
 					reporter.reportarErro("VarInic: O " + i + "º elemento da lista não corresponde ao tipo" + t1);
-				;
 				i++;
 			}
 
