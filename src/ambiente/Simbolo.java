@@ -18,7 +18,7 @@ public class Simbolo {
 	}
 	
 	private Simbolo (String n) {
-		this.id=n; 
+		this.id = n; 
 		this.hashCd = this.hashcode_(n); 
 	}
 	
@@ -28,7 +28,7 @@ public class Simbolo {
 	
 	public static Simbolo getSimbolo(String n) {
 		Simbolo s = dict.get(n);
-		if (s==null) { 
+		if (s == null) { 
 			s = new Simbolo(n); 
 			dict.put(n,s); 
 		}

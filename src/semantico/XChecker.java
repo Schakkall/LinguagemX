@@ -1,4 +1,4 @@
-package checagem;
+package semantico;
 
 import sintaxeAbstrata.*;
 import ambiente.*;
@@ -383,9 +383,8 @@ public final class XChecker implements XVisitor {
 	public Object visitProcedimento(Procedimento procedimento) {
 		ambienteVarCons.openScope();
 
-		for (Parametro par : procedimento.params) {
+		for (Parametro par : procedimento.params) 
 			par.accept(this);
-		}
 
 		procedimento.com.accept(this);
 		ambienteVarCons.closeScope();
@@ -528,7 +527,8 @@ public final class XChecker implements XVisitor {
 					parLst.add(new VinculavelParam(tipoSemantico(par.tipo), false));
 			}
 			ambienteSubRotinas.put(proc.id, new VinculavelFunProc(parLst));
-		} else if (d instanceof Funcao) {
+		} else 
+		if (d instanceof Funcao) {
 			Funcao func = (Funcao) d;
 			for (Parametro par : func.params) {
 				if ((par instanceof ParBaseRef) || (par instanceof ParArrayRef))

@@ -1,4 +1,4 @@
-package checagem;
+package semantico;
 
 public class XTypeErrors {
 	public static final int

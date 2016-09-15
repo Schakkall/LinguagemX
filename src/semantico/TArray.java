@@ -1,4 +1,4 @@
-package checagem;
+package semantico;
 
 public class TArray implements ITSemantico, Cloneable {
 	public TBase tipo;
@@ -60,7 +60,7 @@ public class TArray implements ITSemantico, Cloneable {
 	}
 	
 	public TArray clone(){
-		try {
+		try {	
 			return (TArray) super.clone();
 		} catch	(CloneNotSupportedException e) {
 			return null;

@@ -3,8 +3,14 @@ package main;
 import java.util.ArrayList;
 import java.util.List;
 
-import checagem.XChecker;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+
+import semantico.XChecker;
+import lexico.*;
 import sintaxeAbstrata.*;
+
 
 public class Main {
 
@@ -151,12 +157,33 @@ public class Main {
 		return new Programa(decList);
 
 	}
+	
+    public static void analiseLexica() {
+        try {
+            XLexer l = new XLexer(
+                    new FileReader("p.txt"));
+            while (true) {
+                try {
+                    Token t = l.yylex();
+                    if (t == null) break;
+                    System.out.println(t.toString());
+                } catch (IOException e) {
+                    System.out.println(e.getMessage());
+                }
+            }
+        } catch (FileNotFoundException e1) {
+            System.out.println(e1.getMessage());
+        }
+    }	
 
 	public static void main(String[] args) {
 
+		analiseLexica();
+		/*
 		XChecker c = new XChecker();
 		c.visitPrograma(programa1());
 		c.reporter.imprimirRelatorio();
+		*/
 
 	}
 }

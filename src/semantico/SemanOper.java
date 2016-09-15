@@ -1,4 +1,4 @@
-package checagem;
+package semantico;
 
 import sintaxeAbstrata.BinOp;
 

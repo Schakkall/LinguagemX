@@ -1,4 +1,4 @@
-package checagem;
+package semantico;
 
 public interface ITSemantico {
 	public abstract boolean equals(ITSemantico a);

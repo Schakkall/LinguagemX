@@ -1,6 +1,6 @@
 package ambiente;
 
-import checagem.ITSemantico;
+import semantico.ITSemantico;
 
 public class VinculavelParam extends VinculavelVarCons {
 	public boolean isRef;

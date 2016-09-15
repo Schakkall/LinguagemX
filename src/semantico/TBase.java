@@ -1,6 +1,4 @@
-package checagem;
-
-import sintaxeAbstrata.BinOp;
+package semantico;
 
 public enum TBase implements ITSemantico {
 	INT, BOOL, REAL;
