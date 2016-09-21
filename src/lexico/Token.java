@@ -12,7 +12,7 @@ public class Token {
     }
 
     public String toString() {
-        return (this.conteudo == null ? this.tipo + " | " : this.conteudo + " | ") + "Tipo: " + this.tipo + " Pos: " +this.pos;
+        return "Token: " + (this.conteudo == null ? this.tipo  : this.conteudo ) + " , " + "Tipo: " + this.tipo + " , " + "Pos: " +this.pos;
     }    
 
 }

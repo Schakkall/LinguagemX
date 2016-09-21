@@ -51,6 +51,5 @@ public enum TokenKind {
 	
 	public String toString(){
 		return (this == NONE) ? "error" : super.toString();
-	}
-	
+	}	
 }
