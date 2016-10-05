@@ -382,10 +382,8 @@ public final class XChecker implements XVisitor {
 
 	public Object visitProcedimento(Procedimento procedimento) {
 		ambienteVarCons.openScope();
-
 		for (Parametro par : procedimento.params) 
 			par.accept(this);
-
 		procedimento.com.accept(this);
 		ambienteVarCons.closeScope();
 		return null;

@@ -1,9 +1,15 @@
 package lexico;
 
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+
 %%
 %public
 %class XLexer
 %type Token
+%implements iXSymbols
+%cup
 %line
 %column
 %unicode
@@ -11,13 +17,33 @@ package lexico;
 %{
     StringBuilder string = new StringBuilder();
 
-    private Token token(TokenKind tipo) {
+    private Token token(int tipo) {
         return new Token(tipo, yyline+1, yycolumn+1, null);
     }
 
-    private Token token(TokenKind tipo, Object valor) {
+    private Token token(int tipo, Object valor) {
         return new Token(tipo, yyline+1, yycolumn+1, valor);
     }
+    
+    public static void enumerarTokens(String fileName){
+		try {
+			XLexer lex = new XLexer(new FileReader(fileName));
+			while (true) {
+				try {
+					Token t = lex.next_token();
+					if (t == null)
+						break;
+					System.out.println(t.toString());
+				} catch (IOException e) {
+					System.out.println(e.getMessage());
+				}
+			}
+		} catch (FileNotFoundException e1) {
+			System.out.println(e1.getMessage());
+		}
+		  
+	}
+    
 %}
 
 
@@ -25,7 +51,6 @@ LineTerminator = \r|\n|\r\n
 InputCharacter = [^\r\n]
 
 WhiteSpace = {LineTerminator} | [ \t\f]
-
 
 Comment = {TraditionalComment} | {EndOfLineComment} | {DocumentationComment}
 
@@ -52,56 +77,54 @@ Exponent = [eE] [+-]? [0-9]+
 <YYINITIAL> {
 
   
-  "var"                          { return token(TokenKind.VAR); }
-  "bool"                         { return token(TokenKind.BOOL); }
-  "cons"                         { return token(TokenKind.CONS); }
-  "int"                          { return token(TokenKind.INT); }
-  "real"                         { return token(TokenKind.REAL); }
-  "if"                           { return token(TokenKind.IF); }
-  "then"                         { return token(TokenKind.THEN); }
-  "else"                         { return token(TokenKind.ELSE); }
-  "while"                        { return token(TokenKind.WHILE); }
-  "procedure"                    { return token(TokenKind.PROCEDURE); }
-  "function"                     { return token(TokenKind.FUNCTION); }
+  "var"                          { return token(VAR); }
+  "bool"                         { return token(BOOL); }
+  "cons"                         { return token(CONS); }
+  "int"                          { return token(INT); }
+  "real"                         { return token(REAL); }
+  "if"                           { return token(IF); }
+  "then"                         { return token(THEN); }
+  "else"                         { return token(ELSE); }
+  "while"                        { return token(WHILE); }
+  "procedure"                    { return token(PROCEDURE); }
+  "function"                     { return token(FUNCTION); }
   
   
-  "true"                         { return token(TokenKind.BOOLEAN_LITERAL, true); }
-  "false"                        { return token(TokenKind.BOOLEAN_LITERAL, false); }
+  "true"                         { return token(BOOL_LITERAL, true); }
+  "false"                        { return token(BOOL_LITERAL, false); }
   
   
-  "("                            { return token(TokenKind.LPAREN); }
-  ")"                            { return token(TokenKind.RPAREN); }
-  "{"                            { return token(TokenKind.LBRACE); }
-  "}"                            { return token(TokenKind.RBRACE); }
-  "["                            { return token(TokenKind.LBRACK); }
-  "]"                            { return token(TokenKind.RBRACK); }
-  ";"                            { return token(TokenKind.SEMICOLON); }
-  ","                            { return token(TokenKind.COMMA); }
-  "."                            { return token(TokenKind.DOT); }
+  "("                            { return token(LPAREN); }
+  ")"                            { return token(RPAREN); }
+  "{"                            { return token(LBRACE); }
+  "}"                            { return token(RBRACE); }
+  "["                            { return token(LBRACK); }
+  "]"                            { return token(RBRACK); }
+  ";"                            { return token(SEMICOLON); }
+  ","                            { return token(COMMA); }
   
   
-  ":="                           { return token(TokenKind.ASSIGN); }
-  ">"                            { return token(TokenKind.GT); }
-  "<"                            { return token(TokenKind.LT); }
-  "!"                            { return token(TokenKind.NOT); }
-  "="                            { return token(TokenKind.EQ); }
-  "+"                            { return token(TokenKind.SUM); }
-  "-"                            { return token(TokenKind.SUB); }
-  "*"                            { return token(TokenKind.MUL); }
-  "/"                            { return token(TokenKind.DIV); }
-  "and"                          { return token(TokenKind.AND); }
-  "or"                           { return token(TokenKind.OR); }
-  "%"                            { return token(TokenKind.MOD); }
+  ":="                           { return token(ASSIGN); }
+  ">"                            { return token(GT); }
+  "<"                            { return token(LT); }
+  "!"                            { return token(NOT); }
+  "="                            { return token(EQ); }
+  "+"                            { return token(SUM); }
+  "-"                            { return token(SUB); }
+  "*"                            { return token(MUL); }
+  "/"                            { return token(DIV); }
+  "and"                          { return token(AND); }
+  "or"                           { return token(OR); }
+  "%"                            { return token(MOD); }
   
   
-  "-2147483648"                  { return token(TokenKind.INTEGER_LITERAL, new Integer(Integer.MIN_VALUE)); }
   
-  {DecIntegerLiteral}            { return token(TokenKind.INTEGER_LITERAL, new Integer(yytext())); }
-  {DecLongLiteral}               { return token(TokenKind.INTEGER_LITERAL, new Long(yytext().substring(0,yylength()-1))); }
+  {DecIntegerLiteral}            { return token(INT_LITERAL, new Integer(yytext())); }
+  {DecLongLiteral}               { return token(INT_LITERAL, new Long(yytext().substring(0,yylength()-1))); }
   
-  {FloatLiteral}                 { return token(TokenKind.REAL_LITERAL, new Float(yytext().substring(0,yylength()-1))); }
-  {DoubleLiteral}                { return token(TokenKind.REAL_LITERAL, new Double(yytext())); }
-  {DoubleLiteral}[dD]            { return token(TokenKind.REAL_LITERAL, new Double(yytext().substring(0,yylength()-1))); }
+  {FloatLiteral}                 { return token(REAL_LITERAL, new Float(yytext().substring(0,yylength()-1))); }
+  {DoubleLiteral}                { return token(REAL_LITERAL, new Double(yytext())); }
+  {DoubleLiteral}[dD]            { return token(REAL_LITERAL, new Double(yytext().substring(0,yylength()-1))); }
   
   
   {Comment}                      { /* ignore */ }
@@ -110,9 +133,10 @@ Exponent = [eE] [+-]? [0-9]+
   {WhiteSpace}                   { /* ignore */ }
 
   
-  {Identifier}                   { return token(TokenKind.ID, yytext()); }  
+  {Identifier}                   { return token(ID, yytext()); }  
 }
 
-/* error fallback */
 [^]                              { throw new RuntimeException("Illegal character \""+yytext()+
                                                               "\" at line "+yyline+", column "+yycolumn); }
+                                                              
+<<EOF>> { return token(EOF); }                                                              

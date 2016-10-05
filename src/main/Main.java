@@ -1,50 +1,42 @@
 package main;
 
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
-
+/*
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
 import semantico.XChecker;
+*/
 import lexico.*;
+import sintatico.XParser;
 import sintaxeAbstrata.*;
-
 
 public class Main {
 
 	// Programa da sequencia de Fibonnaci ate 500
 	static Programa programa1() {
-	    /*
-	     * 
-		 * procedure fibonnaci(int n, var int res){ 
-		 * 		var int vFib1 := 1; 
-		 * 		var int vFib2 := 0; 
-		 * 		var int vAuxF := 0; 
-		 * 		while (vFib2 < n) { 
-		 * 			vAuxF := vFib1 + vFib2; 
-		 * 			vFib1 := vFib2; 
-		 * 			vFib2 := vAuxF;
-		 * 		}
-		 * 		res := vFib2;
-		 * }
+		/*
 		 * 
-		 * procedure main(){
-		 * 		var int[10][10][10] x;
-		 * 		var boolean res;
-		 * 		fibonnaci(500, res);
-		 * 		x[5][5][5] = res;
-		 * }
+		 * procedure fibonnaci(int n, var int res){ var int vFib1 := 1; var int
+		 * vFib2 := 0; var int vAuxF := 0; while (vFib2 < n) { vAuxF := vFib1 +
+		 * vFib2; vFib1 := vFib2; vFib2 := vAuxF; } res := vFib2; }
+		 * 
+		 * procedure main(){ var int[10][10][10] x; var boolean res;
+		 * fibonnaci(500, res); x[5][5][5] = res; }
 		 * 
 		 * 
-		 * */
+		 */
 
 		List<DVarConsCom> decComFibo = new ArrayList<>();
 		decComFibo.add(new DV(new VarInic(new TipoBase(TBase.INT), "vAuxF", new LiteralInt(0))));
 		decComFibo.add(new DV(new VarInic(new TipoBase(TBase.INT), "vFib1", new LiteralInt(1))));
 		decComFibo.add(new DV(new VarInic(new TipoBase(TBase.INT), "vFib2", new LiteralInt(0))));
-		//decComFibo.add(new DC(new Cons(new TipoBase(TBase.INT), "vFib2", new LiteralInt(0))));
+		// decComFibo.add(new DC(new Cons(new TipoBase(TBase.INT), "vFib2", new
+		// LiteralInt(0))));
 
 		List<DVarConsCom> comandosLoop = new ArrayList<>();
 		comandosLoop.add(new Com(new ASSIGN(new Simples("vAuxF"),
@@ -52,10 +44,9 @@ public class Main {
 		comandosLoop.add(new Com(new ASSIGN(new Simples("vFib1"), new VarExp(new Simples("vFib2")))));
 		comandosLoop.add(new Com(new ASSIGN(new Simples("vFib2"), new VarExp(new Simples("vAuxF")))));
 
-		decComFibo.add( 
-				new Com(new WHILE(new BinExp(BinOp.MENOR, new VarExp(new Simples("vFib2")), new LiteralInt(500)),
-						new BLOCO(comandosLoop))));
-						
+		decComFibo.add(new Com(new WHILE(new BinExp(BinOp.MENOR, new VarExp(new Simples("vFib2")), new LiteralInt(500)),
+				new BLOCO(comandosLoop))));
+
 		BLOCO corpoFibo = new BLOCO(decComFibo);
 
 		List<Parametro> parListFibo = new ArrayList<>();
@@ -65,48 +56,34 @@ public class Main {
 		Procedimento fibonnaci = new Procedimento("fibonacci", parListFibo, corpoFibo);
 
 		List<DVarConsCom> decComMain = new ArrayList<>();
-		
+
 		decComMain.add(new DV(new VarInic(new TipoBase(TBase.INT), "res", new LiteralInt(0))));
-		
+
 		List<Exp> expList = new ArrayList<>();
 		expList.add(new LiteralInt(500));
-		//expList.add(new LiteralInt(50));
+		// expList.add(new LiteralInt(50));
 		expList.add(new VarExp(new Simples("res")));
 
 		decComMain.add(new Com(new CHAMADA("fibonacci", expList)));
-	
+
 		List<Exp> arrayExp = new ArrayList<>();
 		arrayExp.add(new LiteralInt(10));
 		arrayExp.add(new LiteralInt(10));
 		arrayExp.add(new LiteralInt(10));
 		arrayExp.add(new LiteralInt(10));
-		decComMain.add(new DV( new VarNaoInic(new TipoArray(TBase.INT, arrayExp), "x")));
-		
-		
-		
-		decComMain.add(new Com(
-							new ASSIGN(
-									//new Indexada(
-											new Indexada(
-													new Indexada( 
-															new Indexada(
-																	new Simples("x"), 
-																	new LiteralInt(5)), 
-															new LiteralInt(5)), 
-													new LiteralInt(5)),		
-									//		new LiteralInt(5)), 
-									new VarExp(//new Simples("res")
-											new Indexada(
-											new Indexada(
-													new Indexada( 
-															new Indexada(
-																	new Simples("x"), 
-																	new LiteralInt(5)), 
-															new LiteralInt(5)),
-													new LiteralInt(5)),
-												new LiteralInt(5))
-											))));
-		
+		decComMain.add(new DV(new VarNaoInic(new TipoArray(TBase.INT, arrayExp), "x")));
+
+		decComMain
+				.add(new Com(new ASSIGN(
+						// new Indexada(
+						new Indexada(new Indexada(new Indexada(new Simples("x"), new LiteralInt(5)), new LiteralInt(5)),
+								new LiteralInt(
+										5)),
+				// new LiteralInt(5)),
+				new VarExp(// new Simples("res")
+						new Indexada(new Indexada(
+								new Indexada(new Indexada(new Simples("x"), new LiteralInt(5)), new LiteralInt(5)),
+								new LiteralInt(5)), new LiteralInt(5))))));
 
 		BLOCO corpoMain = new BLOCO(decComMain);
 
@@ -115,7 +92,7 @@ public class Main {
 		Procedimento main = new Procedimento("main", parListMain, corpoMain);
 
 		List<Dec> dList = new ArrayList<>();
-		//dList.add(main);
+		// dList.add(main);
 		dList.add(fibonnaci);
 		dList.add(main);
 
@@ -157,33 +134,27 @@ public class Main {
 		return new Programa(decList);
 
 	}
-	
-    public static void analiseLexica() {
-        try {
-            XLexer l = new XLexer(
-                    new FileReader("p.txt"));
-            while (true) {
-                try {
-                    Token t = l.yylex();
-                    if (t == null) break;
-                    System.out.println(t.toString());
-                } catch (IOException e) {
-                    System.out.println(e.getMessage());
-                }
-            }
-        } catch (FileNotFoundException e1) {
-            System.out.println(e1.getMessage());
-        }
-    }	
+
 
 	public static void main(String[] args) {
 
-		analiseLexica();
+		//XLexer.enumerarTokens("p.txt");
+		
+		try {
+			XParser p = new XParser(new XLexer(new FileReader("p.txt")));
+		
+			Object o = p.parse().value; 
+		
+			System.out.println(o.toString());
+		} catch (Exception e){
+			System.out.println(e.getMessage());
+			e.printStackTrace();
+		}
+		
 		/*
-		XChecker c = new XChecker();
-		c.visitPrograma(programa1());
-		c.reporter.imprimirRelatorio();
-		*/
+		 * XChecker c = new XChecker(); c.visitPrograma(programa1());
+		 * c.reporter.imprimirRelatorio();
+		 */
 
 	}
 }

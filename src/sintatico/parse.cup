@@ -1,0 +1,194 @@
+package lexico;
+
+import java_cup.runtime.*;
+
+scan with {:	  return this.getScanner().next_token();:};
+
+parser code  {:
+    public void report_error(String message, Object info) {
+        StringBuilder m = new StringBuilder("Error ");
+
+        if (info instanceof java_cup.runtime.Symbol) {
+            m.append( "("+info.toString()+")" );
+        }
+        m.append(" : "+message);
+        System.out.println(m);
+    }
+   
+    public void report_fatal_error(String message, Object info) {
+        report_error(message, info);
+        throw new RuntimeException("Fatal Syntax Error");
+    }
+:};
+
+
+// Produções Terminais
+terminal VAR, CONS;
+terminal BOOL, INT, REAL;
+terminal FUNCTION, PROCEDURE;
+terminal IF, THEN, ELSE;
+terminal WHILE;
+
+terminal LBRACK, RBRACK, LBRACE, RBRACE, LPAREN, RPAREN;
+terminal SEMICOLON, COMMA;
+terminal ASSIGN;
+terminal SUM, SUB, MUL, DIV, MOD, UMINUS;
+terminal LT, GT, EQ;
+terminal AND, OR, NOT;
+
+terminal java.lang.Number INT_LITERAL;
+terminal java.lang.Number REAL_LITERAL;
+terminal java.lang.Boolean BOOL_LITERAL;
+terminal java.lang.String ID;
+
+// Produções não terminais
+non terminal programa;
+non terminal dec_list_opt, dec_list, dec, dec_var, dec_cons, dec_func, dec_proc, dec_cons_lst, dec_cons_lst_opt;
+non terminal tipo, tipo_base, tipo_array, /* indices_opt, */ indices, indice;
+non terminal id_inic_lst, id_inic, inic, inic_lst, array_ext /* , array_comp */;
+non terminal literal, exp, una_exp, bin_exp, exp_lst, exp_lst_opt, bloco_exp, chamada, variable;
+non terminal tipo_param, dimen_lst_opt, dimen_lst, dimen, param_ref_opt, parametro, param_lst, parametros_opt;
+non terminal comando, bloco, comando_assign, comando_chamada, comando_if, comando_while, comando_if_then, comando_if_then_else, bloco_comandos_opt, 
+bloco_comandos, dec_comandos;
+
+
+precedence right ASSIGN;
+precedence left ELSE;
+precedence left EQ, GT, LT;
+precedence left SUM, SUB, OR;
+precedence left MUL, DIV, MOD, AND;
+precedence nonassoc UMINUS;
+
+
+start with programa;
+
+programa ::= dec_list_opt ;
+
+dec_list_opt ::= | dec_list;
+	
+dec_list ::= dec | dec_list dec ;
+
+dec ::= dec_var
+	|	dec_cons
+    |   dec_proc    
+    |   dec_func;
+
+tipo ::= tipo_base
+	|	tipo_array;
+
+tipo_base ::= INT | BOOL | REAL ;
+
+tipo_array ::= tipo_base indices;
+
+//indices_opt ::=  | indices;
+
+indices ::= indice | indice indices;
+
+indice ::= LBRACK exp RBRACK;
+
+id_inic_lst ::= id_inic | id_inic COMMA id_inic_lst;
+
+id_inic ::= ID | inic;
+
+inic_lst ::= inic | inic COMMA inic_lst;
+
+inic ::= ID ASSIGN exp | ID ASSIGN array_ext;
+
+array_ext ::= LBRACK exp_lst RBRACK;
+
+//array_comp
+
+dec_var ::= VAR tipo id_inic_lst SEMICOLON;
+
+dec_cons ::= CONS tipo inic_lst SEMICOLON;
+
+literal ::= INT_LITERAL | REAL_LITERAL | BOOL_LITERAL;
+
+exp ::= una_exp | bin_exp;
+
+exp_lst_opt ::= | exp_lst;
+
+exp_lst ::= exp | exp COMMA exp_lst; 
+
+una_exp ::= literal
+	|	variable
+	|	LPAREN exp RPAREN
+	|	chamada
+	|	NOT exp
+	|	SUB exp %prec UMINUS
+	|	bloco_exp;
+	 
+
+variable ::= ID | variable indice;
+
+chamada ::= ID LPAREN exp_lst_opt RPAREN;
+
+bin_exp ::= exp SUM exp
+	|	exp SUB exp
+	|	exp MUL exp
+	|	exp DIV exp
+	|	exp MOD exp
+	|	exp GT exp
+	|	exp	LT exp
+	|	exp EQ exp
+	|	exp AND exp
+	|	exp OR exp;	
+	
+	
+dec_cons_lst_opt ::= | dec_cons_lst;
+
+dec_cons_lst ::= dec_cons | dec_cons dec_cons_lst;	
+	
+bloco_exp ::= LBRACE dec_cons_lst_opt exp RBRACE;
+
+param_ref_opt ::= | VAR;
+
+tipo_param ::= tipo_base dimen_lst_opt;
+
+dimen_lst_opt ::= | dimen_lst;
+
+dimen_lst ::= dimen | dimen dimen_lst; 
+
+dimen ::= LBRACK RBRACK;
+
+parametro ::= param_ref_opt tipo_param ID;
+
+param_lst ::= parametro | parametro COMMA param_lst;
+
+parametros_opt ::= | param_lst;
+
+dec_proc ::= PROCEDURE ID LPAREN parametros_opt RPAREN comando;
+
+dec_func ::= FUNCTION ID LPAREN parametros_opt RPAREN exp;
+ 
+comando ::=
+        bloco
+    |   comando_if
+    |   comando_while
+    |   comando_assign
+    |   comando_chamada;
+
+
+comando_if ::=
+		comando_if_then
+	|	comando_if_then_else;
+	
+comando_if_then ::=
+		IF LPAREN exp RPAREN THEN comando;
+		
+comando_if_then_else ::=
+		IF LPAREN exp RPAREN THEN comando ELSE comando;			
+					
+comando_while ::= WHILE LPAREN exp RPAREN comando ;
+
+comando_assign ::= variable ASSIGN exp SEMICOLON;
+
+comando_chamada ::=  chamada SEMICOLON;
+
+bloco ::= LBRACE bloco_comandos_opt RBRACE ;
+
+bloco_comandos_opt ::=  | bloco_comandos;
+
+bloco_comandos ::= dec_comandos | dec_comandos bloco_comandos;
+
+dec_comandos ::= comando | dec_var | dec_cons;

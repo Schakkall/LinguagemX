@@ -1,18 +1,25 @@
 package lexico;
 
-public class Token {
-    public TokenKind tipo;
+import java_cup.runtime.Symbol;
+
+public class Token extends Symbol{
+    public int tipo;
     public SourcePosition pos;
     public Object conteudo;	
 	
-    public Token(TokenKind tipo, int linha, int coluna, Object conteudo) {
+    public String nome(){
+    	return iXSymbols.terminalNames[this.tipo];
+    }
+    
+    public Token(int tipo, int linha, int coluna, Object conteudo) {
+    	super(tipo, -1, -1, conteudo);
         this.tipo = tipo;
         this.pos = new SourcePosition(linha, coluna);
         this.conteudo = conteudo;
     }
 
     public String toString() {
-        return "Token: " + (this.conteudo == null ? this.tipo  : this.conteudo ) + " , " + "Tipo: " + this.tipo + " , " + "Pos: " +this.pos;
+        return "Token: " + (this.conteudo == null ? this.nome()  : this.conteudo ) + " , " + "Tipo: " + this.nome() + " , " + "Pos: " +this.pos;
     }    
 
 }
