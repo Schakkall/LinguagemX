@@ -66,7 +66,7 @@ programa ::= dec_list_opt ;
 
 dec_list_opt ::= | dec_list;
 	
-dec_list ::= dec | dec_list dec ;
+dec_list ::= dec | dec dec_list;
 
 dec ::= dec_var
 	|	dec_cons
@@ -159,7 +159,7 @@ parametros_opt ::= | param_lst;
 
 dec_proc ::= PROCEDURE ID LPAREN parametros_opt RPAREN comando;
 
-dec_func ::= FUNCTION ID LPAREN parametros_opt RPAREN exp;
+dec_func ::= FUNCTION ID LPAREN parametros_opt RPAREN exp SEMICOLON;
  
 comando ::=
         bloco

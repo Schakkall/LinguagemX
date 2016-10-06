@@ -1,33 +1,25 @@
-var int x, y, k := true;
-var real raio := ((6+1) / -(7*5));
-cons real PI := 3.14;
-var real resultados[] := {area, diametro, area(2)};
+procedure fibonnaci(int n, var int res){ 
+	var int vFib1 := 1; 
+	var int	vFib2 := 0; 
+	var int vAuxF := 0; 
+	while (vFib2 < n) { 
+		vAuxF := vFib1 + vFib2; 
+		vFib1 := vFib2; 
+		vFib2 := vAuxF; 
+	}
+	res := vFib2; 
+}
+
+function teste(int[][][] q)
+	q[0][0][0] + 5;
+
  
-function real areaCirculo(var real r)
-    2 * PI * (r * r);
-
-function real diametroCirculo(var real r) {
-    2 * r;
-    a + 2; // teste
+procedure main(){  
+	var int res;
+	fibonnaci(500, res);
+	
+	/*Isso é apenas um teste*/
+	var int[5] z := [1, 2, 3, 4, 5];
+	var int[10][10][10] x; 
+	x[5][5][5] := teste(x); 
 }
-
-var real area, comprimento, diametro;
-
-procedure main () {
-    area := areaCirculo(raio);
-    diametro := diametroCirculo(raio);
-    comprimento := PI * diametro;
-    
-    var real resultados[] := {area, diametro, comprimento};
-    var int i := 0;
-    var real soma;
-    var bool par;
-    while(i < 3){
-        soma := soma + resultados[i];
-        i := i + 1;
-    }
-    if (soma % 2 = 0) then par := true;
-    else par := false;
-}
-
-procedure troca(int x, int o) if (x > y) then x := y;
