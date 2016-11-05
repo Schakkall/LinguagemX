@@ -6,7 +6,7 @@
 package lexico;
 
 /** CUP generated interface containing symbol constants. */
-public interface iXSymbols {
+public interface IXSymbols {
   /* terminals */
   public static final int CONS = 3;
   public static final int FUNCTION = 7;

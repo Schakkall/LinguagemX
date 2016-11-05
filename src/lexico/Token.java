@@ -8,7 +8,7 @@ public class Token extends Symbol{
     public Object conteudo;	
 	
     public String nome(){
-    	return iXSymbols.terminalNames[this.tipo];
+    	return IXSymbols.terminalNames[this.tipo];
     }
     
     public Token(int tipo, int linha, int coluna, Object conteudo) {

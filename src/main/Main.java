@@ -10,7 +10,7 @@ public class Main {
 	
 	public static void main(String[] args) {	
 		try {
-			XLexer l = new XLexer(new FileReader("p.txt"));
+			XLexer l = new XLexer(new FileReader("p.x"));
 			XParser p = new XParser(l);
 		
 			Programa ast = (Programa) p.parse().value;

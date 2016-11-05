@@ -1,6 +1,6 @@
 package semantico;
 
-public class XTypeErrors {
+public class SErro {
 	public static final int
 		EXP_BINARIA_INVALIDA = 0,
 		EXP_MENOS_INVALIDA = 1,

@@ -16,7 +16,7 @@ import lexico.*;
 public class XParser extends java_cup.runtime.lr_parser {
 
 	public final Class getSymbolContainer() {
-		return iXSymbols.class;
+		return IXSymbols.class;
 	}
 
 	/** Default constructor. */

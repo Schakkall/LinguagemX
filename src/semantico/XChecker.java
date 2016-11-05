@@ -1,6 +1,7 @@
 package semantico;
 
 import sintaxeAbstrata.*;
+import interpretacao.Alocador;
 import ambiente.*;
 import utils.RegistradorDeErros;
 
@@ -18,7 +19,7 @@ public final class XChecker implements XVisitor {
 		ITSemantico tDir = (ITSemantico) binExp.dirExp.accept(this);
 
 		if (TBase.isBool(tEsq) && TBase.isBool(tDir))
-			if (SemanOper.isBoolOper(binExp.op))
+			if (SOper.isBoolOper(binExp.op))
 				return TBase.BOOL;
 			else {
 				reporter.reportarErro(
@@ -26,9 +27,9 @@ public final class XChecker implements XVisitor {
 				return TBase.BOOL;
 			}
 		else if (TBase.isInt(tEsq) && TBase.isInt(tDir))
-			if (SemanOper.isNumOper(binExp.op))
+			if (SOper.isNumOper(binExp.op))
 				return TBase.INT;
-			else if (SemanOper.isRelaOper(binExp.op))
+			else if (SOper.isRelaOper(binExp.op))
 				return TBase.BOOL;
 			else {
 				reporter.reportarErro(
@@ -36,9 +37,9 @@ public final class XChecker implements XVisitor {
 				return TBase.INT;
 			}
 		else if (TBase.isReal(tEsq) && TBase.isReal(tDir))
-			if (SemanOper.isNumOper(binExp.op) && binExp.op != BinOp.MOD)
+			if (SOper.isNumOper(binExp.op) && binExp.op != BinOp.MOD)
 				return TBase.REAL;
-			else if (SemanOper.isRelaOper(binExp.op))
+			else if (SOper.isRelaOper(binExp.op))
 				return TBase.BOOL;
 			else {
 				reporter.reportarErro(
@@ -47,9 +48,9 @@ public final class XChecker implements XVisitor {
 			}
 		else if (TBase.isInt(tEsq) && TBase.isReal(tDir)) {
 			tEsq = this.toReal(binExp.esqExp);
-			if (SemanOper.isNumOper(binExp.op) && binExp.op != BinOp.MOD)
+			if (SOper.isNumOper(binExp.op) && binExp.op != BinOp.MOD)
 				return TBase.REAL;
-			else if (SemanOper.isRelaOper(binExp.op))
+			else if (SOper.isRelaOper(binExp.op))
 				return TBase.BOOL;
 			else {
 				reporter.reportarErro(
@@ -58,9 +59,9 @@ public final class XChecker implements XVisitor {
 			}
 		} else if (TBase.isReal(tEsq) && TBase.isInt(tDir)) {
 			tDir = this.toReal(binExp.dirExp);
-			if (SemanOper.isNumOper(binExp.op) && binExp.op != BinOp.MOD)
+			if (SOper.isNumOper(binExp.op) && binExp.op != BinOp.MOD)
 				return TBase.REAL;
-			else if (SemanOper.isRelaOper(binExp.op))
+			else if (SOper.isRelaOper(binExp.op))
 				return TBase.BOOL;
 			else {
 				reporter.reportarErro(
@@ -440,14 +441,14 @@ public final class XChecker implements XVisitor {
 			if (!((t1 instanceof TArray) && (((TArray) t1).dim == 1)))
 				reporter.reportarErro("VarInic: Apenas arrays de uma dimensao podem ser inicializados por extenso");
 			else {
-				int i = 0;
+				int i = 1;
 				ITSemantico t2;
 				for (Exp exp : varInicExt.expList) {
 					t2 = (ITSemantico) exp.accept(this);
 					if ((TBase.isReal(t1)) && (TBase.isInt(t2)))
 						this.toReal(exp);
 					if (!((TArray) t1).tipo.equals(t2))
-						reporter.reportarErro("VarInic: O " + i + "º elemento da lista não corresponde ao tipo" + t1);
+						reporter.reportarErro("VarInic: O " + i + "º elemento da lista não corresponde ao tipo " + ((TArray) t1).tipo);
 					i++;
 				}
 			}

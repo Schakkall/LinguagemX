@@ -2,7 +2,7 @@ package semantico;
 
 import sintaxeAbstrata.BinOp;
 
-public abstract class SemanOper {
+public abstract class SOper {
 	public static boolean isBoolOper(BinOp b) {
 		switch (b) {
 		case DIV:

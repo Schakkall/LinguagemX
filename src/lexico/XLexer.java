@@ -11,7 +11,7 @@ import java.io.IOException;
  * 1.6.1 from the specification file
  * <tt>F:/WorkSpace/TheLanguageX/src/lexico/lexico.flex</tt>
  */
-public class XLexer implements iXSymbols, java_cup.runtime.Scanner {
+public class XLexer implements IXSymbols, java_cup.runtime.Scanner {
 
 	/** This character denotes the end of file */
 	public static final int YYEOF = -1;
