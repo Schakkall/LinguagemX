@@ -319,6 +319,7 @@ public class XLexer implements iXSymbols, java_cup.runtime.Scanner {
 	private int yyline;
 
 	/** the number of characters up to the start of the matched text */
+	@SuppressWarnings("unused")
 	private int yychar;
 
 	/**
@@ -330,6 +331,7 @@ public class XLexer implements iXSymbols, java_cup.runtime.Scanner {
 	/**
 	 * zzAtBOL == true <=> the scanner is currently at the beginning of a line
 	 */
+	@SuppressWarnings("unused")
 	private boolean zzAtBOL = true;
 
 	/** zzAtEOF == true <=> the scanner is at the EOF */
