@@ -11,8 +11,9 @@ public class BlocoExp extends Exp {
 		this.consList = new ArrayList<DCons>();
 	} 	
 	
-	public BlocoExp(List<DCons> consList){
+	public BlocoExp(List<DCons> consList, Exp exp){
 		this.consList = consList;
+		this.exp = exp;
 	} 
 	
 	public void AddExp(DCons consList) {

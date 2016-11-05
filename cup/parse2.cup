@@ -7,7 +7,7 @@ scan with {:
 :};
 
 parser code  {:
-    public void report_error(String message, Object info) {
+    public void report_error(String message, Object info) {	
         StringBuilder m = new StringBuilder("Error ");
 
         if (info instanceof java_cup.runtime.Symbol) {
@@ -24,6 +24,8 @@ parser code  {:
 :};
 
 
+
+
 // Terminais
 terminal VAR, CONS;
 terminal BOOL, INT, REAL;
@@ -38,10 +40,10 @@ terminal SUM, SUB, MUL, DIV, MOD, UMINUS;
 terminal LT, GT, EQ;
 terminal AND, OR, NOT;
 
-terminal INT_LITERAL;
-terminal REAL_LITERAL;
-terminal BOOL_LITERAL;
-terminal ID;
+terminal java.lang.Number INT_LITERAL;
+terminal java.lang.Number REAL_LITERAL;
+terminal java.lang.Boolean BOOL_LITERAL;
+terminal java.lang.String ID;
 
 // Não Terminais
 non terminal programa;
@@ -54,14 +56,12 @@ non terminal comando, bloco, comando_assign, comando_chamada, comando_if, comand
 bloco_comandos, dec_comandos;
 
 
-precedence nonassoc ASSIGN;
+precedence right ASSIGN;
 precedence left ELSE;
-precedence nonassoc EQ, GT, LT;
+precedence left EQ, GT, LT;
 precedence left SUM, SUB, OR;
 precedence left MUL, DIV, MOD, AND;
 precedence nonassoc UMINUS;
-
-
 start with programa;
 
 programa ::= dec_list_opt ;

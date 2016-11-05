@@ -1,0 +1,546 @@
+package sintatico;
+
+import java.util.*;
+import java_cup.runtime.*;
+import sintaxeAbstrata.*;
+import lexico.*;
+
+scan with {:
+		return this.getScanner().next_token();
+:};
+
+parser code  {:
+    public void report_error(String message, Object info) {
+        StringBuilder m = new StringBuilder("Erro ");
+
+        if (info instanceof java_cup.runtime.Symbol) {
+            m.append( "("+info.toString()+")" );
+        }
+        m.append(" : "+message);
+        System.out.println(m);
+    }
+   
+    public void report_fatal_error(String message, Object info) {
+        report_error(message, info);
+        //throw new RuntimeException("Fatal Syntax Error");
+    }
+:};
+
+
+//Terminais
+terminal VAR, CONS;
+terminal BOOL, INT, REAL;
+terminal FUNCTION, PROCEDURE;
+terminal IF, THEN, ELSE;
+terminal WHILE;
+
+terminal java.lang.Integer INT_LITERAL;
+terminal java.lang.Double REAL_LITERAL;
+terminal java.lang.Boolean BOOL_LITERAL;
+terminal java.lang.String ID;
+
+terminal LBRACK, RBRACK, LBRACE, RBRACE, LPAREN, RPAREN;
+terminal SEMICOLON, COMMA;
+terminal ASSIGN;
+terminal SUM, SUB, MUL, DIV, MOD, UMINUS;
+terminal LT, GT, EQ;
+terminal AND, OR, NOT;
+
+non terminal Programa programa;
+
+non terminal List<Dec> dec_list_opt, dec_list, dec;
+non terminal List<DecVar> dec_var;
+non terminal List<DecCons> dec_cons;
+non terminal List<DCons> dec_cons_lst, dec_cons_lst_opt;
+non terminal Funcao dec_func; 
+non terminal Procedimento dec_proc;
+
+	
+non terminal Tipo tipo; 
+non terminal TipoBase tipo_base; 
+non terminal TipoArray tipo_array; 
+non terminal TBase tbase;
+non terminal List<Exp> indices;
+non terminal Exp indice;
+	
+non terminal List<Object> id_inic_lst, inic_lst;
+non terminal Object[] id_inic, inic;
+non terminal List<Exp> array_ext /* , array_comp */;
+	
+non terminal Literal literal; 
+non terminal Exp exp, una_exp, bin_exp;
+non terminal List<Exp> exp_lst, exp_lst_opt; 
+non terminal Object[] chamada, bloco_exp; 
+non terminal Var variable;
+	
+non terminal Object[] tipo_param;
+non terminal Integer dimen_lst_opt, dimen_lst, dimen;
+non terminal Boolean param_ref_opt;
+non terminal Parametro parametro;
+non terminal List<Parametro> param_lst, parametros_opt;
+	
+non terminal Comando comando; 
+non terminal BLOCO bloco;
+non terminal ASSIGN comando_assign; 
+non terminal CHAMADA comando_chamada;
+non terminal WHILE comando_while;
+non terminal IF comando_if, comando_if_then, comando_if_then_else;
+non terminal List<DVarConsCom> bloco_comandos_opt, bloco_comandos; 
+non terminal DVarConsCom dec_comandos;
+
+precedence nonassoc ELSE;
+precedence nonassoc EQ, GT, LT;
+precedence left SUM, SUB;
+precedence left MUL, DIV, MOD;
+precedence left OR, AND;
+precedence nonassoc UMINUS;
+
+
+start with programa;
+
+programa ::= 
+		dec_list_opt:dl {: 
+			RESULT = new Programa(dl); 
+		:} ;
+
+dec_list_opt ::= 
+		{: 
+			RESULT = new ArrayList<Dec>(); 
+		:}
+	|	dec_list:dl {: 
+			RESULT = dl; 
+		:};
+	
+dec_list ::= 
+		dec:d {: 
+			RESULT = new ArrayList<Dec>(d); 
+		:} 
+	|	dec_list:dl dec:d {: 
+			dl.addAll(d); 
+			RESULT = dl; 
+		:};
+
+dec ::= 
+		dec_var:d  {: 
+			RESULT = new ArrayList<Dec>(d); 
+		:}
+	|	dec_cons:d {: 
+			RESULT = new ArrayList<Dec>(d); 
+		:}
+    |   dec_proc:d {: 
+    		RESULT = new ArrayList<Dec>(Arrays.asList(d)); ; 
+    	:}   
+    |   dec_func:d {: 
+    		RESULT = new ArrayList<Dec>(Arrays.asList(d)); ; 
+    	:};
+
+tipo ::= 
+		tipo_base:t  {: 
+			RESULT = t; 
+		:}
+	|	tipo_array:t {: 
+			RESULT = t;
+		:};
+
+tipo_base ::= 
+		tbase:t {: 
+			RESULT = new TipoBase(t); 
+		:};  
+
+tbase ::=
+		INT  {:
+			RESULT = TBase.INT;
+		:} 
+	|	BOOL {: 
+			RESULT = TBase.BOOL; 
+		:}
+	|	REAL {: 
+			RESULT = TBase.REAL;
+		:};
+		
+
+tipo_array ::= 
+		tbase:t indices:il {: 
+			RESULT = new TipoArray(t, il); 
+		:};
+
+//indices_opt ::=  | indices;
+
+indices ::= 
+		indice:i {: 
+			RESULT = new ArrayList<Exp>(Arrays.asList(i)); 
+		:} 
+	|	indices:il indice:i {: 
+			il.add(i); 
+			RESULT = il; 
+		:};
+
+indice ::= 
+		LBRACK exp:e RBRACK {: 
+			RESULT = e; 
+		:};
+
+id_inic_lst ::= 
+		id_inic:ii {: 
+			RESULT = new ArrayList<Object>(Arrays.asList((Object) ii)); 
+		:}   
+	|	id_inic_lst:iil COMMA id_inic:ii {: 
+			iil.add(ii); 
+			RESULT = iil; 
+		:};
+
+id_inic ::= 
+		ID:id {:
+			RESULT = new Object[]{id, null}; 
+		:}
+	|	inic:in {:
+			RESULT = in;
+		:};
+
+inic_lst ::= 
+		inic:in {: 
+			RESULT = new ArrayList<Object>(Arrays.asList((Object) in)); 
+		:}
+	|	inic_lst:inl COMMA inic:in {: 
+			inl.add(in); 
+			RESULT = inl; 
+		:};
+
+inic ::= 
+		ID:id ASSIGN exp:e {:
+			RESULT = new Object[]{id, e}; 
+		:} 
+	|	ID:id ASSIGN array_ext:e {:
+			RESULT = new Object[]{id, e}; 
+		:};
+
+array_ext ::= 
+		LBRACK exp_lst:el RBRACK {:  
+			RESULT = el; 
+		:};
+
+//array_comp
+
+dec_var ::= 
+		VAR tipo:t id_inic_lst:ii SEMICOLON {:
+			List<DecVar> dl = new ArrayList<DecVar>(); 
+			for (Object i : ii) {
+				Object[] v = (Object[]) i;
+				
+				if (v[1] == null) {
+					 dl.add(new DecVar(new VarNaoInic(t, (String) v[0])) );
+				} else
+				if (v[1] instanceof Exp) {
+					 dl.add(new DecVar(new VarInic(t, (String) v[0], (Exp) v[1])));
+				} else {
+					 dl.add(new DecVar(new VarInicExt(t, (String) v[0], (ArrayList<Exp>) v[1])));
+				};				
+			};
+			RESULT = dl; 
+		:};
+
+dec_cons ::= 
+		CONS tipo:t inic_lst:il SEMICOLON {:
+			List<DecCons> dl = new ArrayList<DecCons>(); 
+			for (Object i : il) {
+				Object[] v = (Object[]) i;
+				
+				if (v[1] instanceof Exp) {
+					dl.add(new DecCons(new Cons(t, (String) v[0], (Exp) v[1])));
+				} else {
+					dl.add(new DecCons(new ConsExt(t, (String) v[0], (ArrayList<Exp>) v[1])));
+				};				
+			};
+			RESULT = dl; 
+		:};
+
+literal ::= 
+		INT_LITERAL:l {:
+			RESULT = new LiteralInt(l);		
+		:}
+	|	REAL_LITERAL:l {:
+			RESULT = null;				
+		:}
+	|	BOOL_LITERAL:l {:
+			RESULT = new LiteralBool(l);
+		:};
+
+exp ::= 
+		una_exp:e {:
+			RESULT = e;
+		:}
+	|	bin_exp:e {:
+			RESULT = e;
+		:};
+
+exp_lst_opt ::=
+		{: 
+			RESULT = new ArrayList<Exp>(); 
+		:}	
+	|	exp_lst:el {:
+			RESULT = el;			
+		:};
+
+exp_lst ::=
+		exp:e {:
+			RESULT = new ArrayList<Exp>(Arrays.asList(e)); 
+		:}
+	|	exp_lst:el COMMA exp:e {:
+			el.add(e);
+			RESULT = el;
+		:}; 
+
+una_exp ::= 
+		literal:l {:
+			RESULT = l;
+		:}
+	|	variable:v {:
+			RESULT = new VarExp(v);
+		:}
+	|	LPAREN exp:e RPAREN {:
+			RESULT = e;
+		:}
+	|	chamada:c {:
+			RESULT = new ChamadaExp((String) c[0], (List<Exp>) c[1]);
+		:}
+	|	NOT exp:e {:
+			RESULT = new Nao(e);
+		:}		
+	|	SUB exp:e {:
+			RESULT = new Menos(e);
+		:} %prec UMINUS
+	|	bloco_exp:be {:
+			RESULT = new BlocoExp((List<DCons>) be[0], (Exp) be[1]);
+		:};
+	 
+
+variable ::=
+		ID:id {:
+			RESULT = new Simples(id);
+		:}
+	|	variable:v indice:i {:
+			RESULT = new Indexada(v, i);
+		:};
+
+chamada ::=
+		ID:id LPAREN exp_lst_opt:e RPAREN {:
+			RESULT = new Object[]{id, e};
+		:};
+
+bin_exp ::=
+		exp:e1 SUM exp:e2 {:
+			RESULT = new BinExp(BinOp.SOM, e1, e2);
+		:}
+	|	exp:e1 SUB exp:e2 {:
+			RESULT = new BinExp(BinOp.SUB, e1, e2);
+		:}
+	|	exp:e1 MUL exp:e2 {:
+			RESULT = new BinExp(BinOp.MUL, e1, e2);
+		:}
+	|	exp:e1 DIV exp:e2 {:
+			RESULT = new BinExp(BinOp.DIV, e1, e2);
+		:}
+	|	exp:e1 MOD exp:e2 {:
+			RESULT = new BinExp(BinOp.MOD, e1, e2);
+		:}
+	|	exp:e1 GT exp:e2 {:
+			//RESULT = null;
+			RESULT = new BinExp(BinOp.SOM, e1, e2);
+		:}
+	|	exp:e1 LT exp:e2 {:
+			RESULT = new BinExp(BinOp.MENOR, e1, e2);
+		:}
+	|	exp:e1 EQ exp:e2 {:
+			RESULT = new BinExp(BinOp.IGUAL, e1, e2);
+		:}
+	|	exp:e1 AND exp:e2 {:
+			RESULT = new BinExp(BinOp.E, e1, e2);
+		:}
+	|	exp:e1 OR exp:e2 {:
+			RESULT = new BinExp(BinOp.OU, e1, e2);
+		:};	
+	
+	
+dec_cons_lst_opt ::=
+		{: 
+			RESULT = new ArrayList<DCons>(); 
+		:}	
+	|	dec_cons_lst:dcl {: 
+			RESULT = dcl; 
+		:};
+
+dec_cons_lst ::=
+		dec_cons:dc {:
+			ArrayList<DCons> r  = new ArrayList<DCons>();
+			for (DecCons d: dc) 
+				r.add(d.dcons);
+			RESULT = r;
+		:}		
+	|	dec_cons:dc dec_cons_lst:dcl {:
+			for (DecCons d: dc) 
+				dcl.add(d.dcons);
+			RESULT = dcl;
+		:};	
+	
+bloco_exp ::= 
+		LBRACE dec_cons_lst_opt:dcl exp:e RBRACE {:
+			RESULT = new Object[]{dcl, e};
+		:};
+
+param_ref_opt ::=
+		{:
+			RESULT = false;
+		:}
+	|	VAR	{:
+			RESULT = true;
+		:};
+
+tipo_param ::= 
+		tbase:t dimen_lst_opt:dls {:
+			RESULT = new Object[]{t, dls};
+		:};
+
+dimen_lst_opt ::=
+		{:
+			RESULT = 0;
+		:}
+	|	dimen_lst:dls {:
+			RESULT = dls;
+		:};
+
+dimen_lst ::=
+		dimen:d {:
+			RESULT = d;
+		:}
+	|	dimen:d dimen_lst:dls {:
+			RESULT = dls + d;
+		:}; 
+
+dimen ::= LBRACK RBRACK {:
+			RESULT = 1;
+		:};
+
+parametro ::=
+		param_ref_opt:p tipo_param:tp ID:id	{:
+			if (p) 
+				if ((Integer) tp[1] > 0) 
+					RESULT = new ParArrayRef((TBase) tp[0], id, (Integer) tp[1]);
+				else
+					RESULT = new ParBaseRef((TBase) tp[0], id);
+			else
+				if ((Integer) tp[1] > 0) 
+					RESULT = new ParArrayCopia((TBase) tp[0], id, (Integer) tp[1]);
+				else
+					RESULT = new ParBaseCopia((TBase) tp[0], id);
+		:};
+
+param_lst ::=
+		parametro:p {:
+			RESULT =  new ArrayList<Parametro>(Arrays.asList(p));
+		:}
+	|	param_lst:pl COMMA parametro:p {:
+			pl.add(p);
+			RESULT = pl;
+		:};
+
+parametros_opt ::= 
+		{:
+			RESULT =  new ArrayList<Parametro>();
+		:}
+	|	param_lst:pl {:
+			RESULT = pl;
+		:};
+
+dec_proc ::=
+		PROCEDURE ID:id LPAREN parametros_opt:pl RPAREN comando:c {:
+			RESULT =  new Procedimento(id, pl, c);
+		:};
+
+dec_func ::=
+		FUNCTION tipo:t ID:id LPAREN parametros_opt:pl RPAREN exp:e SEMICOLON {:
+			RESULT =  new Funcao(t, id, pl, e);
+		:};
+		
+comando ::=
+        bloco:c {:
+        	RESULT = c;
+        :}
+    |   comando_if:c {:
+        	RESULT = c;
+        :}
+    |   comando_while:c {:
+        	RESULT = c;
+        :}
+    |   comando_assign:c {:
+        	RESULT = c;
+        :}
+    |   comando_chamada:c {:
+        	RESULT = c;
+        :};
+
+
+comando_if ::=
+		comando_if_then:c {:
+        	RESULT = c;
+        :}
+	|	comando_if_then_else:c {:
+        	RESULT = c;
+        :};
+	
+comando_if_then ::=
+		IF LPAREN exp:e RPAREN THEN comando:c {:
+        	RESULT = new IF(e, c);
+        :};
+		
+comando_if_then_else ::=
+		IF LPAREN exp:e RPAREN THEN comando:c1 ELSE comando:c2 {:
+        	RESULT = new IF(e, c1, c2);
+        :};			
+					
+comando_while ::=
+		WHILE LPAREN exp:e RPAREN comando:c {:
+        	RESULT = new WHILE(e, c);
+        :};
+
+comando_assign ::=
+		variable:v ASSIGN exp:e SEMICOLON {:
+        	RESULT = new ASSIGN(v, e);
+        :};
+
+comando_chamada ::=
+		chamada:c SEMICOLON {:
+        	RESULT = new CHAMADA((String) c[0], (List<Exp>) c[1]);
+        :};
+
+bloco ::=
+		LBRACE bloco_comandos_opt:b RBRACE {:
+        	RESULT = new BLOCO(b);
+        :};
+
+bloco_comandos_opt ::=
+		{:
+			RESULT = new ArrayList<DVarConsCom>();
+		:} 
+	|	bloco_comandos:b {:
+			RESULT = b;
+		:};
+
+bloco_comandos ::=
+		dec_comandos:d {:
+			RESULT = new ArrayList<DVarConsCom>(Arrays.asList(d));
+		:}
+	|	bloco_comandos:dvccl dec_comandos:dvcc {:
+			dvccl.add(dvcc);
+			RESULT = dvccl;
+		:};
+
+dec_comandos ::= 
+		comando:c {:
+			RESULT = new Com(c);
+		:}
+	|	dec_var:dvar {:
+			RESULT = new DV(dvar.get(0).dvar);
+		:} 
+	|	dec_cons:dcons {:
+			RESULT = new DC(dcons.get(0).dcons);
+		:};

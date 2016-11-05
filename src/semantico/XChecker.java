@@ -7,15 +7,6 @@ import utils.RegistradorDeErros;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Classe que efetua análise semântica de programas na linguagem X
- * 
- * @author  Simone Ris Santos Silva
- * @author  J. Eurique C. Ribeiro Jr
- * @author  Leonardo de Jesus Silva
- */
-
-
 public final class XChecker implements XVisitor {
 
 	AmbienteVarCons ambienteVarCons = new AmbienteVarCons();
@@ -100,7 +91,7 @@ public final class XChecker implements XVisitor {
 			t = vinculo.retorno.tipo;
 
 			if (chamadaExp.expLst.size() != vinculo.params.size()) {
-				reporter.reportarErro("Chamada: Número de paramêtros difere do declarado");
+				reporter.reportarErro("ChamadaExp: Número de paramêtros difere do declarado");
 			} else
 				for (int i = 0; i < chamadaExp.expLst.size(); i++) {
 					ITSemantico t1 = (ITSemantico) chamadaExp.expLst.get(i).accept(this);
@@ -115,16 +106,16 @@ public final class XChecker implements XVisitor {
 						if (!VarExp.isVarExp(chamadaExp.expLst.get(i)))
 							if (!vinculo.params.get(i).isCons)
 								reporter.reportarErro(
-										"Chamada: Passagem de parâmetros por referência exige uma variável");
+										"ChamadaExp: Passagem de parâmetros por referência exige uma variável");
 							else
 								reporter.reportarErro(
-										"Chamada: Uma constante não pode ser passada por referência para uma subrotina");
+										"ChamadaExp: Uma constante não pode ser passada por referência para uma subrotina");
 
 					if (!t2.equals(t1))
-						reporter.reportarErro("Chamada: Tipo do parâmetro real difere do tipo do parâmetro formal");
+						reporter.reportarErro("ChamadaExp: Tipo do parâmetro real difere do tipo do parâmetro formal");
 				}
 		} else
-			reporter.reportarErro("Chamada: Subrotina não declarada");
+			reporter.reportarErro("ChamadaExp: Subrotina não declarada");
 
 		return t;
 	}
@@ -194,7 +185,8 @@ public final class XChecker implements XVisitor {
 			reporter.reportarErro("If: " + t + " não é um tipo adequado para a condição de um if");
 
 		comandoIf.comandoEntao.accept(this);
-		comandoIf.comandoSenao.accept(this);
+		if (comandoIf.comandoSenao != null)
+			comandoIf.comandoSenao.accept(this);
 		return null;
 	}
 
@@ -247,7 +239,7 @@ public final class XChecker implements XVisitor {
 			for (Exp exp : consExt.expList) {
 				t2 = (ITSemantico) exp.accept(this);
 				if ((TBase.isReal(t1)) && (TBase.isInt(t2)))
-					this.toReal(exp);				
+					this.toReal(exp);
 				if (!t1.equals(t2))
 					reporter.reportarErro("ConsExt: O " + i + "º elemento da lista não corresponde ao tipo" + t1);
 				i++;
@@ -382,7 +374,7 @@ public final class XChecker implements XVisitor {
 
 	public Object visitProcedimento(Procedimento procedimento) {
 		ambienteVarCons.openScope();
-		for (Parametro par : procedimento.params) 
+		for (Parametro par : procedimento.params)
 			par.accept(this);
 		procedimento.com.accept(this);
 		ambienteVarCons.closeScope();
@@ -392,7 +384,7 @@ public final class XChecker implements XVisitor {
 	public Object visitPrograma(Programa programa) {
 		for (Dec d : programa.decList)
 			this.registrarSeSubRotina(d);
-		
+
 		ambienteVarCons.openScope();
 		for (Dec d : programa.decList)
 			d.accept(this);
@@ -445,16 +437,19 @@ public final class XChecker implements XVisitor {
 			reporter.reportarErro("VarInicExt: Identificador já declarado");
 		else {
 			ITSemantico t1 = (ITSemantico) varInicExt.tipo.accept(this);
-
-			int i = 0;
-			ITSemantico t2;
-			for (Exp exp : varInicExt.expList) {
-				t2 = (ITSemantico) exp.accept(this);
-				if ((TBase.isReal(t1)) && (TBase.isInt(t2)))
-					this.toReal(exp);
-				if (!t1.equals(t2))
-					reporter.reportarErro("VarInic: O " + i + "º elemento da lista não corresponde ao tipo" + t1);
-				i++;
+			if (!((t1 instanceof TArray) && (((TArray) t1).dim == 1)))
+				reporter.reportarErro("VarInic: Apenas arrays de uma dimensao podem ser inicializados por extenso");
+			else {
+				int i = 0;
+				ITSemantico t2;
+				for (Exp exp : varInicExt.expList) {
+					t2 = (ITSemantico) exp.accept(this);
+					if ((TBase.isReal(t1)) && (TBase.isInt(t2)))
+						this.toReal(exp);
+					if (!((TArray) t1).tipo.equals(t2))
+						reporter.reportarErro("VarInic: O " + i + "º elemento da lista não corresponde ao tipo" + t1);
+					i++;
+				}
 			}
 
 			ambienteVarCons.put(varInicExt.id, new VinculavelVarCons(t1, false));
@@ -519,20 +514,35 @@ public final class XChecker implements XVisitor {
 		if (d instanceof Procedimento) {
 			Procedimento proc = (Procedimento) d;
 			for (Parametro par : proc.params) {
-				if ((par instanceof ParBaseRef) || (par instanceof ParArrayRef))
-					parLst.add(new VinculavelParam(tipoSemantico(par.tipo), true));
+				if (par instanceof ParArrayRef)
+					parLst.add(
+							new VinculavelParam(new TArray(tipoSemantico(par.tipo), ((ParArrayRef) par).dim), true));
+				else if (par instanceof ParBaseRef)
+					parLst.add(
+							new VinculavelParam(tipoSemantico(par.tipo), true));
+				else if (par instanceof ParArrayCopia)
+					parLst.add(
+							new VinculavelParam(new TArray(tipoSemantico(par.tipo), ((ParArrayCopia) par).dim), false));
 				else
-					parLst.add(new VinculavelParam(tipoSemantico(par.tipo), false));
+					parLst.add(
+							new VinculavelParam(tipoSemantico(par.tipo), false));
 			}
 			ambienteSubRotinas.put(proc.id, new VinculavelFunProc(parLst));
-		} else 
-		if (d instanceof Funcao) {
+		} else if (d instanceof Funcao) {
 			Funcao func = (Funcao) d;
 			for (Parametro par : func.params) {
-				if ((par instanceof ParBaseRef) || (par instanceof ParArrayRef))
-					parLst.add(new VinculavelParam(tipoSemantico(par.tipo), true));
+				if (par instanceof ParArrayRef)
+					parLst.add(
+							new VinculavelParam(new TArray(tipoSemantico(par.tipo), ((ParArrayRef) par).dim), true));
+				else if (par instanceof ParBaseRef)
+					parLst.add(
+							new VinculavelParam(tipoSemantico(par.tipo), true));
+				else if (par instanceof ParArrayCopia)
+					parLst.add(
+							new VinculavelParam(new TArray(tipoSemantico(par.tipo), ((ParArrayCopia) par).dim), false));
 				else
-					parLst.add(new VinculavelParam(tipoSemantico(par.tipo), false));
+					parLst.add(
+							new VinculavelParam(tipoSemantico(par.tipo), false));
 			}
 			ambienteSubRotinas.put(func.id,
 					new VinculavelFunProc(parLst, new VinculavelVarCons((ITSemantico) func.tipo.accept(this), true)));

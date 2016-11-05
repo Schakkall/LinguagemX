@@ -18,21 +18,21 @@ public enum TBase implements ITSemantico {
 		if (b instanceof TBase)
 			return (b.equals(TBase.BOOL)) ? true : false;
 		else
-			return false;
+			return ((TArray) b).isAcessadoComoTipoBase() && ((TArray) b).tipo.equals(TBase.BOOL) ? true : false;
 	}
 
 	public static boolean isInt(ITSemantico b) {
 		if (b instanceof TBase)
 			return (b.equals(TBase.INT)) ? true : false;
 		else
-			return false;
+			return ((TArray) b).isAcessadoComoTipoBase() && ((TArray) b).tipo.equals(TBase.INT) ? true : false;
 	}
 
 	public static boolean isReal(ITSemantico b) {
 		if (b instanceof TBase)
 			return (b.equals(TBase.REAL)) ? true : false;
 		else
-			return false;
+			return ((TArray) b).isAcessadoComoTipoBase() && ((TArray) b).tipo.equals(TBase.REAL) ? true : false;
 	}	
 	
 }

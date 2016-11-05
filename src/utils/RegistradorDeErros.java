@@ -20,7 +20,8 @@ public class RegistradorDeErros {
 	  }
 	  
 	  public void imprimirRelatorio() {
-		    System.out.println(erros);
+		  for (String erro: erros)  
+			  System.out.println(erro);
 	  }	  
 
 }

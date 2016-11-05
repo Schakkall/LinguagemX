@@ -32,6 +32,10 @@ public class TArray implements ITSemantico, Cloneable {
 		return (dim >= level) ? dim - level : 0;
 	}
 	
+	public boolean isAcessadoComoTipoBase(){
+		return dimensaoNivelAcesso() == 0;
+	}
+	
 	public void prepararAcesso(){
 		this.level = 0;
 	}

@@ -12,7 +12,7 @@ public class Token extends Symbol{
     }
     
     public Token(int tipo, int linha, int coluna, Object conteudo) {
-    	super(tipo, -1, -1, conteudo);
+    	super(tipo, conteudo);
         this.tipo = tipo;
         this.pos = new SourcePosition(linha, coluna);
         this.conteudo = conteudo;
