@@ -1,8 +1,9 @@
 package semantico;
 
 import sintaxeAbstrata.*;
-import interpretacao.Alocador;
+//import interpretacao.Alocador;
 import ambiente.*;
+import interpretacao.Alocador;
 import utils.RegistradorDeErros;
 
 import java.util.ArrayList;
@@ -26,7 +27,8 @@ public final class XChecker implements XVisitor {
 						"BinExp: Operacao " + binExp.op + " não se aplica a tipos " + tEsq + " e " + tDir);
 				return TBase.BOOL;
 			}
-		else if (TBase.isInt(tEsq) && TBase.isInt(tDir))
+		else 
+		if (TBase.isInt(tEsq) && TBase.isInt(tDir))
 			if (SOper.isNumOper(binExp.op))
 				return TBase.INT;
 			else if (SOper.isRelaOper(binExp.op))
@@ -36,7 +38,8 @@ public final class XChecker implements XVisitor {
 						"BinExp: Operacao " + binExp.op + " não se aplica a tipos " + tEsq + " e " + tDir);
 				return TBase.INT;
 			}
-		else if (TBase.isReal(tEsq) && TBase.isReal(tDir))
+		else 
+		if (TBase.isReal(tEsq) && TBase.isReal(tDir))
 			if (SOper.isNumOper(binExp.op) && binExp.op != BinOp.MOD)
 				return TBase.REAL;
 			else if (SOper.isRelaOper(binExp.op))
@@ -46,7 +49,8 @@ public final class XChecker implements XVisitor {
 						"BinExp: Operacao " + binExp.op + " não se aplica a tipos " + tEsq + " e " + tDir);
 				return TBase.REAL;
 			}
-		else if (TBase.isInt(tEsq) && TBase.isReal(tDir)) {
+		else 
+		if (TBase.isInt(tEsq) && TBase.isReal(tDir)) {
 			tEsq = this.toReal(binExp.esqExp);
 			if (SOper.isNumOper(binExp.op) && binExp.op != BinOp.MOD)
 				return TBase.REAL;
@@ -57,7 +61,8 @@ public final class XChecker implements XVisitor {
 						"BinExp: Operacao " + binExp.op + " não se aplica a tipos " + tEsq + " e " + tDir);
 				return TBase.REAL;
 			}
-		} else if (TBase.isReal(tEsq) && TBase.isInt(tDir)) {
+		} else
+		if (TBase.isReal(tEsq) && TBase.isInt(tDir)) {
 			tDir = this.toReal(binExp.dirExp);
 			if (SOper.isNumOper(binExp.op) && binExp.op != BinOp.MOD)
 				return TBase.REAL;
@@ -214,7 +219,7 @@ public final class XChecker implements XVisitor {
 			if (!t1.equals(t2))
 				reporter.reportarErro("Cons: A constante não pode ser incializado com " + t2);
 
-			ambienteVarCons.put(cons.id, new VinculavelVarCons(t1, false));
+			ambienteVarCons.put(cons.id, new VinculavelVarCons(t1, false, Alocador.getDefault().next()));
 		}
 		return null;
 	}
@@ -224,7 +229,7 @@ public final class XChecker implements XVisitor {
 			reporter.reportarErro("ConsComp: Identificador já declarado");
 		else {
 			ITSemantico tipo = (ITSemantico) consComp.tipo.accept(this);
-			ambienteVarCons.put(consComp.id, new VinculavelVarCons(tipo, true));
+			ambienteVarCons.put(consComp.id, new VinculavelVarCons(tipo, true, Alocador.getDefault().next()));
 		}
 		return null;
 	}
@@ -245,7 +250,7 @@ public final class XChecker implements XVisitor {
 					reporter.reportarErro("ConsExt: O " + i + "º elemento da lista não corresponde ao tipo" + t1);
 				i++;
 			}
-			ambienteVarCons.put(consExt.id, new VinculavelVarCons(t1, false));
+			ambienteVarCons.put(consExt.id, new VinculavelVarCons(t1, false, Alocador.getDefault().next()));
 		}
 		return null;
 	}
@@ -272,6 +277,8 @@ public final class XChecker implements XVisitor {
 
 	public Object visitFuncao(Funcao funcao) {
 		ambienteVarCons.openScope();
+		Alocador.setDefaultAsPilha();
+		Alocador.pilha().reset();
 
 		for (Parametro par : funcao.params) {
 			par.accept(this);
@@ -343,7 +350,8 @@ public final class XChecker implements XVisitor {
 		if (this.ambienteVarCons.isDeclaradaNesteEscopo(parBaseCopia.id))
 			reporter.reportarErro("ParBaseCopia: Identificador já declarado");
 		else
-			ambienteVarCons.put(parBaseCopia.id, new VinculavelParam(tipoSemantico(parBaseCopia.tipo), false));
+			ambienteVarCons.put(parBaseCopia.id, 
+					new VinculavelParam(tipoSemantico(parBaseCopia.tipo), false, Alocador.getDefault().next()));
 		return null;
 	}
 
@@ -351,7 +359,8 @@ public final class XChecker implements XVisitor {
 		if (this.ambienteVarCons.isDeclaradaNesteEscopo(parBaseRef.id))
 			reporter.reportarErro("ParBaseRef: Identificador já declarado");
 		else
-			ambienteVarCons.put(parBaseRef.id, new VinculavelParam(tipoSemantico(parBaseRef.tipo), true));
+			ambienteVarCons.put(parBaseRef.id, 
+					new VinculavelParam(tipoSemantico(parBaseRef.tipo), true, Alocador.getDefault().next()));
 		return null;
 	}
 
@@ -360,7 +369,7 @@ public final class XChecker implements XVisitor {
 			reporter.reportarErro("ParArrayCopia: Identificador já declarado");
 		else
 			ambienteVarCons.put(parArrayCopia.id,
-					new VinculavelParam(new TArray(tipoSemantico(parArrayCopia.tipo), parArrayCopia.dim), false));
+					new VinculavelParam(new TArray(tipoSemantico(parArrayCopia.tipo), parArrayCopia.dim), false, Alocador.getDefault().next()));
 		return null;
 	}
 
@@ -369,12 +378,14 @@ public final class XChecker implements XVisitor {
 			reporter.reportarErro("parArrayRef: Identificador já declarado");
 		else
 			ambienteVarCons.put(parArrayRef.id,
-					new VinculavelParam(new TArray(tipoSemantico(parArrayRef.tipo), parArrayRef.dim), true));
+					new VinculavelParam(new TArray(tipoSemantico(parArrayRef.tipo), parArrayRef.dim), true, Alocador.getDefault().next()));
 		return null;
 	}
 
 	public Object visitProcedimento(Procedimento procedimento) {
 		ambienteVarCons.openScope();
+		Alocador.setDefaultAsPilha();
+		Alocador.pilha().reset();
 		for (Parametro par : procedimento.params)
 			par.accept(this);
 		procedimento.com.accept(this);
@@ -385,10 +396,12 @@ public final class XChecker implements XVisitor {
 	public Object visitPrograma(Programa programa) {
 		for (Dec d : programa.decList)
 			this.registrarSeSubRotina(d);
-
 		ambienteVarCons.openScope();
-		for (Dec d : programa.decList)
+		Alocador.global().reset();
+		for (Dec d : programa.decList) {
+			Alocador.setDefaultAsGlobal();
 			d.accept(this);
+		}
 		ambienteVarCons.closeScope();
 		return null;
 	}
@@ -417,8 +430,8 @@ public final class XChecker implements XVisitor {
 
 			if (!t1.equals(t2))
 				reporter.reportarErro("VarInic: A variável não pode ser inicializado com " + t2);
-
-			ambienteVarCons.put(varInic.id, new VinculavelVarCons(t1, false));
+		
+			ambienteVarCons.put(varInic.id, new VinculavelVarCons(t1, false, Alocador.getDefault().next()));
 		}
 		return null;
 	}
@@ -428,7 +441,7 @@ public final class XChecker implements XVisitor {
 			reporter.reportarErro("VarInicComp: Identificador já declarado");
 		else {
 			ITSemantico tipo = (ITSemantico) varInicComp.tipo.accept(this);
-			ambienteVarCons.put(varInicComp.id, new VinculavelVarCons(tipo, false));
+			ambienteVarCons.put(varInicComp.id, new VinculavelVarCons(tipo, false, Alocador.getDefault().next()));
 		}
 		return null;
 	}
@@ -453,7 +466,7 @@ public final class XChecker implements XVisitor {
 				}
 			}
 
-			ambienteVarCons.put(varInicExt.id, new VinculavelVarCons(t1, false));
+			ambienteVarCons.put(varInicExt.id, new VinculavelVarCons(t1, false, Alocador.getDefault().next()));
 		}
 		return null;
 	}
@@ -463,7 +476,7 @@ public final class XChecker implements XVisitor {
 			reporter.reportarErro("VarNaoInic: Identificador já declarado");
 		else {
 			ITSemantico tipo = (ITSemantico) varNaoInic.tipo.accept(this);
-			ambienteVarCons.put(varNaoInic.id, new VinculavelVarCons(tipo, false));
+			ambienteVarCons.put(varNaoInic.id, new VinculavelVarCons(tipo, false, Alocador.getDefault().next()));
 		}
 		return null;
 	}
@@ -518,10 +531,12 @@ public final class XChecker implements XVisitor {
 				if (par instanceof ParArrayRef)
 					parLst.add(
 							new VinculavelParam(new TArray(tipoSemantico(par.tipo), ((ParArrayRef) par).dim), true));
-				else if (par instanceof ParBaseRef)
+				else 
+				if (par instanceof ParBaseRef)
 					parLst.add(
 							new VinculavelParam(tipoSemantico(par.tipo), true));
-				else if (par instanceof ParArrayCopia)
+				else 
+				if (par instanceof ParArrayCopia)
 					parLst.add(
 							new VinculavelParam(new TArray(tipoSemantico(par.tipo), ((ParArrayCopia) par).dim), false));
 				else
@@ -529,16 +544,19 @@ public final class XChecker implements XVisitor {
 							new VinculavelParam(tipoSemantico(par.tipo), false));
 			}
 			ambienteSubRotinas.put(proc.id, new VinculavelFunProc(parLst));
-		} else if (d instanceof Funcao) {
+		} else 
+		if (d instanceof Funcao) {
 			Funcao func = (Funcao) d;
 			for (Parametro par : func.params) {
 				if (par instanceof ParArrayRef)
 					parLst.add(
 							new VinculavelParam(new TArray(tipoSemantico(par.tipo), ((ParArrayRef) par).dim), true));
-				else if (par instanceof ParBaseRef)
+				else 
+				if (par instanceof ParBaseRef)
 					parLst.add(
 							new VinculavelParam(tipoSemantico(par.tipo), true));
-				else if (par instanceof ParArrayCopia)
+				else 
+				if (par instanceof ParArrayCopia)
 					parLst.add(
 							new VinculavelParam(new TArray(tipoSemantico(par.tipo), ((ParArrayCopia) par).dim), false));
 				else

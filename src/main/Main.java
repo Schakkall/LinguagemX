@@ -7,6 +7,9 @@ import sintatico.XParser;
 import sintaxeAbstrata.Programa;
 
 public class Main {
+	// Corrigir geração de sintaxe abstrata para List<DVarConsCom> em dec_comandos no Parser
+	// Corrigir sintaxe do tipo de retorno de funcao na declaração de funções para aceitar vetores no Parser
+
 	
 	public static void main(String[] args) {	
 		try {
