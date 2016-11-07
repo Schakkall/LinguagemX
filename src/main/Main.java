@@ -1,5 +1,10 @@
 package main;
 
+//TODO Parser: Corrigir geração de sintaxe abstrata para as declarações em forma de listas no blocos (Declarações globais estão ok)
+//TODO Parser: Corrigir sintaxe do tipo de retorno das funções; Nas declarações de funções, o tipo de retorno deve poder ser TArray
+//TODO Interpreter: Implementar passagem de parâmetros por referência 
+
+
 import java.io.FileReader;
 
 import interpretacao.XInterpreter;
@@ -9,8 +14,6 @@ import sintatico.XParser;
 import sintaxeAbstrata.Programa;
 
 public class Main {
-	//TODO Corrigir geração de sintaxe abstrata para List<DVarConsCom> em dec_comandos no Parser
-	//TODO Corrigir sintaxe do tipo de retorno de funcao na declaração de funções para aceitar vetores no Parser
 	
 	public static void main(String[] args) {	
 		try {
