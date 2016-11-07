@@ -3,7 +3,7 @@ package interpretacao;
 public class Alocador {
 	private Integer pos = 0;
 	
-	private static Boolean def = false;
+	private static Boolean def = true;
 
 	private static Alocador pilha = new Alocador();
 	private static Alocador global = new Alocador();
@@ -19,9 +19,15 @@ public class Alocador {
 	}
 	
 	public Endereco next(){
-		//System.out.println(this.pos);
-		return new Endereco(this.pos++);
+		//System.out.println((def) ? new Endereco(this.pos, TEndereco.GLOBAL) : new Endereco(this.pos, TEndereco.PILHA));		
+		return (def) ? new Endereco(this.pos++, TEndereco.GLOBAL) : new Endereco(this.pos++, TEndereco.PILHA);
 	}
+	
+	public Endereco current(){
+		//System.out.println((def) ? new Endereco(this.pos, TEndereco.GLOBAL) : new Endereco(this.pos, TEndereco.PILHA));
+		return (def) ? new Endereco(this.pos, TEndereco.GLOBAL) : new Endereco(this.pos, TEndereco.PILHA);
+	}
+
 	
 	public void reset(){
 		this.pos = 0;

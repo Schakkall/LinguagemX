@@ -1,6 +1,6 @@
 package sintaxeAbstrata;
 
-public class DecVar extends Dec {
+public class DecVar extends Dec implements IDeclaracao {
 	public DVar dvar;
 	
 	public DecVar(DVar dvar) {

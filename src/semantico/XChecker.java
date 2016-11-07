@@ -218,7 +218,8 @@ public final class XChecker implements XVisitor {
 
 			if (!t1.equals(t2))
 				reporter.reportarErro("Cons: A constante não pode ser incializado com " + t2);
-
+			
+			cons.endr = Alocador.getDefault().current();
 			ambienteVarCons.put(cons.id, new VinculavelVarCons(t1, false, Alocador.getDefault().next()));
 		}
 		return null;
@@ -229,6 +230,8 @@ public final class XChecker implements XVisitor {
 			reporter.reportarErro("ConsComp: Identificador já declarado");
 		else {
 			ITSemantico tipo = (ITSemantico) consComp.tipo.accept(this);
+			
+			consComp.endr = Alocador.getDefault().current();
 			ambienteVarCons.put(consComp.id, new VinculavelVarCons(tipo, true, Alocador.getDefault().next()));
 		}
 		return null;
@@ -250,6 +253,8 @@ public final class XChecker implements XVisitor {
 					reporter.reportarErro("ConsExt: O " + i + "º elemento da lista não corresponde ao tipo" + t1);
 				i++;
 			}
+			
+			consExt.endr = Alocador.getDefault().current();
 			ambienteVarCons.put(consExt.id, new VinculavelVarCons(t1, false, Alocador.getDefault().next()));
 		}
 		return null;
@@ -293,6 +298,7 @@ public final class XChecker implements XVisitor {
 		if (!t2.equals(t1))
 			reporter.reportarErro("Funcao: Tipo da expressão não é compatível com o tipo de retorno da função");
 
+		funcao.setFrameSize(Alocador.pilha().current().getValue());
 		ambienteVarCons.closeScope();
 		return t2;
 	}
@@ -349,36 +355,46 @@ public final class XChecker implements XVisitor {
 	public Object visitParBaseCopia(ParBaseCopia parBaseCopia) {
 		if (this.ambienteVarCons.isDeclaradaNesteEscopo(parBaseCopia.id))
 			reporter.reportarErro("ParBaseCopia: Identificador já declarado");
-		else
+		else {
+			
+			parBaseCopia.endr = Alocador.getDefault().current();
 			ambienteVarCons.put(parBaseCopia.id, 
 					new VinculavelParam(tipoSemantico(parBaseCopia.tipo), false, Alocador.getDefault().next()));
+		}
 		return null;
 	}
 
 	public Object visitParBaseRef(ParBaseRef parBaseRef) {
 		if (this.ambienteVarCons.isDeclaradaNesteEscopo(parBaseRef.id))
 			reporter.reportarErro("ParBaseRef: Identificador já declarado");
-		else
+		else {
+			parBaseRef.endr = Alocador.getDefault().current();
 			ambienteVarCons.put(parBaseRef.id, 
 					new VinculavelParam(tipoSemantico(parBaseRef.tipo), true, Alocador.getDefault().next()));
+		}
 		return null;
 	}
 
 	public Object visitParArrayCopia(ParArrayCopia parArrayCopia) {
 		if (this.ambienteVarCons.isDeclaradaNesteEscopo(parArrayCopia.id))
 			reporter.reportarErro("ParArrayCopia: Identificador já declarado");
-		else
+		else {
+			parArrayCopia.endr = Alocador.getDefault().current();
 			ambienteVarCons.put(parArrayCopia.id,
 					new VinculavelParam(new TArray(tipoSemantico(parArrayCopia.tipo), parArrayCopia.dim), false, Alocador.getDefault().next()));
+		}
 		return null;
 	}
 
 	public Object visitParArrayRef(ParArrayRef parArrayRef) {
 		if (this.ambienteVarCons.isDeclaradaNesteEscopo(parArrayRef.id))
 			reporter.reportarErro("parArrayRef: Identificador já declarado");
-		else
+		else {
+			parArrayRef.endr = Alocador.getDefault().current();
 			ambienteVarCons.put(parArrayRef.id,
 					new VinculavelParam(new TArray(tipoSemantico(parArrayRef.tipo), parArrayRef.dim), true, Alocador.getDefault().next()));
+		}
+			
 		return null;
 	}
 
@@ -389,6 +405,7 @@ public final class XChecker implements XVisitor {
 		for (Parametro par : procedimento.params)
 			par.accept(this);
 		procedimento.com.accept(this);
+		procedimento.setFrameSize(Alocador.pilha().current().getValue());
 		ambienteVarCons.closeScope();
 		return null;
 	}
@@ -430,7 +447,8 @@ public final class XChecker implements XVisitor {
 
 			if (!t1.equals(t2))
 				reporter.reportarErro("VarInic: A variável não pode ser inicializado com " + t2);
-		
+			
+			varInic.endr = Alocador.getDefault().current();
 			ambienteVarCons.put(varInic.id, new VinculavelVarCons(t1, false, Alocador.getDefault().next()));
 		}
 		return null;
@@ -441,6 +459,7 @@ public final class XChecker implements XVisitor {
 			reporter.reportarErro("VarInicComp: Identificador já declarado");
 		else {
 			ITSemantico tipo = (ITSemantico) varInicComp.tipo.accept(this);
+			varInicComp.endr = Alocador.getDefault().current();
 			ambienteVarCons.put(varInicComp.id, new VinculavelVarCons(tipo, false, Alocador.getDefault().next()));
 		}
 		return null;
@@ -465,7 +484,8 @@ public final class XChecker implements XVisitor {
 					i++;
 				}
 			}
-
+			
+			varInicExt.endr = Alocador.getDefault().current();
 			ambienteVarCons.put(varInicExt.id, new VinculavelVarCons(t1, false, Alocador.getDefault().next()));
 		}
 		return null;
@@ -476,6 +496,7 @@ public final class XChecker implements XVisitor {
 			reporter.reportarErro("VarNaoInic: Identificador já declarado");
 		else {
 			ITSemantico tipo = (ITSemantico) varNaoInic.tipo.accept(this);
+			varNaoInic.endr = Alocador.getDefault().current();
 			ambienteVarCons.put(varNaoInic.id, new VinculavelVarCons(tipo, false, Alocador.getDefault().next()));
 		}
 		return null;
@@ -488,6 +509,8 @@ public final class XChecker implements XVisitor {
 		if (t == null) {
 			reporter.reportarErro("Simples: Identificador " + simples.id + " não declarado");
 			t = TBase.INT;
+		} else {
+			simples.setEndr(vinculo.endr);
 		}
 
 		return t;
@@ -503,19 +526,6 @@ public final class XChecker implements XVisitor {
 
 	public Object visitIntToReal(IntToReal intToReal) {
 		return TBase.REAL;
-	}
-
-	private TBase tipoSemantico(sintaxeAbstrata.TBase b) {
-		switch (b) {
-		case BOOL:
-			return TBase.BOOL;
-		case INT:
-			return TBase.INT;
-		case REAL:
-			return TBase.REAL;
-		default:
-			return null;
-		}
 	}
 
 	private TBase toReal(Exp exp) {

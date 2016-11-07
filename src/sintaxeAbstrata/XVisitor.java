@@ -1,5 +1,8 @@
 package sintaxeAbstrata;
 
+import semantico.TArray;
+import semantico.TBase;
+
 public interface XVisitor {
 	public Object visitBinExp(BinExp binExp);
 	public Object visitBlocoExp(BlocoExp blocoExp);
@@ -38,4 +41,26 @@ public interface XVisitor {
 	public Object visitBLOCO(BLOCO bloco);
 	public Object visitTipoArray(TipoArray tipoArray);
 	public Object visitIntToReal(IntToReal intToReal);
+
+	default semantico.TBase tipoSemantico(sintaxeAbstrata.TBase b) {
+		switch (b) {
+		case BOOL:
+			return TBase.BOOL;
+		case INT:
+			return TBase.INT;
+		case REAL:
+			return TBase.REAL;
+		default:
+			return null;
+		}
+	}
+	
+	default semantico.ITSemantico tipoSemantico(sintaxeAbstrata.Tipo b) {
+		if (b instanceof sintaxeAbstrata.TipoBase)
+			return this.tipoSemantico(((sintaxeAbstrata.TipoBase) b).base);
+		else
+			return new TArray(this.tipoSemantico(((sintaxeAbstrata.TipoArray) b).base), ((sintaxeAbstrata.TipoArray) b).expList.size());
+	}
+	
+
 }
