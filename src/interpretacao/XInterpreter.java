@@ -16,6 +16,19 @@ public class XInterpreter implements XVisitor{
 	Map<String, ISubrotina> subrotinas = new HashMap<String, ISubrotina>();
 	RegistradorDeErros reporter = new RegistradorDeErros();
 	
+	public Value defaultValue(Tipo tipo) {
+		if (TBase.isBool(this.tipoSemantico(tipo)))
+			return new BoolVal(false);
+		else
+		if (TBase.isInt(this.tipoSemantico(tipo)))
+			return new IntVal(0);
+		else
+		if (TBase.isReal(this.tipoSemantico(tipo)))
+			return null;
+		else
+			return null;
+	}
+	
 	public Object visitBinExp(BinExp binExp) {
 		Value vEsq = (Value) binExp.esqExp.accept(this);
 		Value vDir = (Value) binExp.dirExp.accept(this);
@@ -152,11 +165,11 @@ public class XInterpreter implements XVisitor{
 
 	public Object visitFuncao(Funcao funcao) {
 		Integer currentFrameSize = mem.getFrameSize();			
-		mem.openFrame();
+		mem.newFrame();
 		mem.setFrameSize(funcao.frameSize());
 		Value vRes = (Value) funcao.exp.accept(this);
 		mem.setFrameSize(currentFrameSize);			
-		mem.closeFrame();
+		mem.destroyFrame();
 		return vRes;
 	}
 
@@ -215,11 +228,11 @@ public class XInterpreter implements XVisitor{
 
 	public Object visitProcedimento(Procedimento procedimento) {
 		Integer currentFrameSize = mem.getFrameSize();
-		mem.openFrame();
+		mem.newFrame();
 		mem.setFrameSize(procedimento.frameSize());
 		procedimento.com.accept(this);
 		mem.setFrameSize(currentFrameSize);			
-		mem.closeFrame();		
+		mem.destroyFrame();		
 		return null;
 	}
 
@@ -273,15 +286,7 @@ public class XInterpreter implements XVisitor{
 	}
 
 	public Object visitVarNaoInic(VarNaoInic varNaoInic) {
-		if (TBase.isBool(this.tipoSemantico(varNaoInic.tipo)))
-			mem.setValue(varNaoInic.endr, new BoolVal(false));
-		else
-		if (TBase.isInt(this.tipoSemantico(varNaoInic.tipo)))
-			mem.setValue(varNaoInic.endr, new IntVal(0));
-		else
-		if (TBase.isReal(this.tipoSemantico(varNaoInic.tipo)))
-			mem.setValue(varNaoInic.endr, null);
-			
+		mem.setValue(varNaoInic.endr, this.defaultValue(varNaoInic.tipo));
 		return null;
 	}
 

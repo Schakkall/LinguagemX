@@ -17,7 +17,7 @@ function int vezes10(int x)
 
 procedure main(){  
 	var int d0 := 12;
-	var int d1 := vezes10(d0);
+	cons int d1 := vezes10(d0);
 	teste(d1 + d0, 10 + 1, 10 + 2);
 	var int d2 := d0 * d1 * 10;
 	teste(d1 + d0, 10 + 1, 10 + 2);

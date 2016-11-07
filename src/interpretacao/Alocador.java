@@ -18,13 +18,11 @@ public class Alocador {
 		return global;
 	}
 	
-	public Endereco next(){
-		//System.out.println((def) ? new Endereco(this.pos, TEndereco.GLOBAL) : new Endereco(this.pos, TEndereco.PILHA));		
+	public Endereco next(){		
 		return (def) ? new Endereco(this.pos++, TEndereco.GLOBAL) : new Endereco(this.pos++, TEndereco.PILHA);
 	}
 	
 	public Endereco current(){
-		//System.out.println((def) ? new Endereco(this.pos, TEndereco.GLOBAL) : new Endereco(this.pos, TEndereco.PILHA));
 		return (def) ? new Endereco(this.pos, TEndereco.GLOBAL) : new Endereco(this.pos, TEndereco.PILHA);
 	}
 

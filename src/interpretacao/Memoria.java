@@ -1,23 +1,22 @@
 package interpretacao;
 
 import java.util.Arrays;
-import java.util.List;
 
 public class Memoria {
 	
-	//public final int size = Integer.MAX_VALUE - 5;
-	public final int size = 100;
+	//public final int MAX_SIZE = Integer.MAX_VALUE - 5;
+	public final int MAX_SIZE = 100;
 	
-	public Value[] global = new Value[size];
-	public Value[] pilha = new Value[size];
+	public Value[] global = new Value[MAX_SIZE];
+	public Value[] pilha = new Value[MAX_SIZE];
 	private int framePointer = 0;
 	private int frameSize = 0;
 	
-	public void openFrame(){
+	public void newFrame(){
 		this.framePointer += this.frameSize;
 	}
 	
-	public void closeFrame(){
+	public void destroyFrame(){
 		this.framePointer -= this.frameSize;
 	}	
 	
@@ -39,22 +38,6 @@ public class Memoria {
 			this.pilha[this.framePointer + endr.getValue()] = val;
 	}
 	
-	public Value getGlobalValue(Endereco endr){
-		return this.global[endr.getValue()];
-	}
-	
-	public Value getPilhaValue(Endereco endr){
-		return this.pilha[endr.getValue()];
-	}
-	
-	public void setGlobalValue(Endereco endr, Value val){
-		this.global[endr.getValue()] = val;
-	}
-	
-	public void setPilhaValue(Endereco endr, Value val){
-		this.pilha[endr.getValue()] = val;
-	}
-
 	public int getFramePointer() {
 		return framePointer;
 	}
