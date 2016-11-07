@@ -67,12 +67,8 @@ public class XInterpreter implements XVisitor{
 		ISubrotina func = subrotinas.get(chamadaExp.id);
 		Value vRes = new IntVal(0);
 		if (func instanceof Funcao) {
-			Integer currentFrameSize = mem.getFrameSize();
-			this.passarParametros(((Funcao) func).params, chamadaExp.expLst);			
-			mem.openFrame();
+			this.passarParametros(((Funcao) func).params, chamadaExp.expLst);
 			vRes = ((Value) ((Funcao) func).accept(this));
-			mem.setFrameSize(currentFrameSize);			
-			mem.closeFrame();
 		}
 		return vRes;
 	}
@@ -90,12 +86,8 @@ public class XInterpreter implements XVisitor{
 	public Object visitCHAMADA(CHAMADA comandoChamada) {
 		ISubrotina proc = subrotinas.get(comandoChamada.id);
 		if (proc instanceof Procedimento) {
-			Integer currentFrameSize = mem.getFrameSize();
 			this.passarParametros(((Procedimento) proc).params, comandoChamada.expLst);
-			mem.openFrame();
 			((Procedimento) proc).accept(this);
-			mem.setFrameSize(currentFrameSize);			
-			mem.closeFrame();
 		}
 		return null;
 	}
@@ -104,7 +96,8 @@ public class XInterpreter implements XVisitor{
 		if (((BoolVal) comandoIf.condicao.accept(this)).b)
 			comandoIf.comandoEntao.accept(this);
 		else
-			comandoIf.comandoSenao.accept(this);
+			if (comandoIf.comandoSenao != null)
+				comandoIf.comandoSenao.accept(this);
 		return null;
 	}
 
@@ -158,8 +151,13 @@ public class XInterpreter implements XVisitor{
 	}
 
 	public Object visitFuncao(Funcao funcao) {
+		Integer currentFrameSize = mem.getFrameSize();			
+		mem.openFrame();
 		mem.setFrameSize(funcao.frameSize());
-		return funcao.exp.accept(this);
+		Value vRes = (Value) funcao.exp.accept(this);
+		mem.setFrameSize(currentFrameSize);			
+		mem.closeFrame();
+		return vRes;
 	}
 
 	public Object visitIndexada(Indexada indexada) {
@@ -216,8 +214,12 @@ public class XInterpreter implements XVisitor{
 	}
 
 	public Object visitProcedimento(Procedimento procedimento) {
+		Integer currentFrameSize = mem.getFrameSize();
+		mem.openFrame();
 		mem.setFrameSize(procedimento.frameSize());
 		procedimento.com.accept(this);
+		mem.setFrameSize(currentFrameSize);			
+		mem.closeFrame();		
 		return null;
 	}
 
