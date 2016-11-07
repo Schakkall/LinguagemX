@@ -1,7 +1,8 @@
 package main;
 
 /**
- * Tradutor da Linguagem X
+ * Tradutor para Linguagem X
+ * 
  * @author José Eurique Cardoso Ribeiro Junior
  * @author Leonardo Santos de Jesus
  */
