@@ -1,5 +1,11 @@
 package main;
 
+/**
+ * Tradutor da Linguagem X
+ * @author José Eurique Cardoso Ribeiro Junior
+ * @author Leonardo Santos de Jesus
+ */
+
 //TODO Parser: Corrigir geração de sintaxe abstrata para as declarações em forma de listas no blocos (Declarações globais estão ok)
 //TODO Parser: Corrigir sintaxe do tipo de retorno das funções; Nas declarações de funções, o tipo de retorno deve poder ser TArray
 //TODO Interpreter: Implementar passagem de parâmetros por referência 
@@ -34,7 +40,6 @@ public class Main {
 				}
 			}
 			
-			System.out.println(ast.toString());
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 		}		

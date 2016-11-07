@@ -21,6 +21,7 @@ procedure main(){
 	teste(d1 + d0, 10 + 1, 10 + 2);
 	var int d2 := d0 * d1 * 10;
 	teste(d1 + d0, 10 + 1, 10 + 2);
+	var int d3 := -15;
 
 	if (d0 = 11) then
 		d0 := d0 - 1;
